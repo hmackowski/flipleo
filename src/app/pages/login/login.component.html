@@ -1,0 +1,61 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div class="login-header">
+        <img src="assets/flipleo.png" class="login-logo" alt="Flipleo logo">
+        <mat-card-title>Welcome to Flipleo</mat-card-title>
+        <mat-card-subtitle>Sign in to start flipping</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="login()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            required
+            autocomplete="username"
+          >
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            [(ngModel)]="password"
+            name="password"
+            required
+            autocomplete="current-password"
+          >
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <button mat-raised-button color="primary" type="submit" class="login-button">
+          Sign In
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

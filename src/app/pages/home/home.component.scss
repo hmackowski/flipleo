@@ -1,0 +1,218 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// Hero Section
+.hero {
+  text-align: center;
+  padding: 80px 20px 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: -20px -20px 60px -20px;
+  color: white;
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    margin: 0 0 40px 0;
+    opacity: 0.95;
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  .cta-button {
+    font-size: 1.1rem;
+    padding: 12px 32px;
+    height: auto;
+
+    mat-icon {
+      margin-left: 8px;
+    }
+  }
+}
+
+// How It Works
+.how-it-works {
+  margin-bottom: 80px;
+  text-align: center;
+
+  h2 {
+    font-size: 2.5rem;
+    margin: 0 0 50px 0;
+    color: #333;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+  }
+
+  .step {
+    text-align: center;
+
+    .step-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+        color: white;
+      }
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      margin: 0 0 12px 0;
+      color: #333;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}
+
+// Example Deals
+.example-deals {
+  margin-bottom: 80px;
+
+  h2 {
+    font-size: 2.5rem;
+    margin: 0 0 40px 0;
+    text-align: center;
+    color: #333;
+  }
+
+  .deals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  .deal-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+
+      .deal-icon {
+        font-size: 48px;
+        margin-right: 16px;
+      }
+
+      mat-card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 1rem;
+
+      .label {
+        color: #666;
+      }
+
+      .buy-price {
+        color: #f44336;
+        font-weight: 600;
+      }
+
+      .sell-price {
+        color: #4caf50;
+        font-weight: 600;
+      }
+    }
+
+    .profit-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+
+      .profit-amount {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #667eea;
+      }
+
+      .profit-percent {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #4caf50;
+        background: #e8f5e9;
+        padding: 4px 12px;
+        border-radius: 12px;
+      }
+    }
+  }
+}
+
+// Stats Section
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  padding: 60px 20px;
+  background: #f5f5f5;
+  margin: 0 -20px;
+  text-align: center;
+
+  .stat {
+    h3 {
+      font-size: 1.5rem;
+      margin: 0 0 12px 0;
+      color: #333;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}

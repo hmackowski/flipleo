@@ -1,0 +1,148 @@
+<div class="records-container">
+  <h1>My Flip Records</h1>
+
+  <!-- Add Record Form -->
+  <mat-card class="add-record-card">
+    <mat-card-header>
+      <mat-card-title>Add New Flip</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="addRecord()" class="record-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Item Name</mat-label>
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="itemName"
+            name="itemName"
+            placeholder="e.g., PS5 Controller"
+            required
+          >
+        </mat-form-field>
+
+        <div class="price-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Buy Price</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="buyPrice"
+              name="buyPrice"
+              placeholder="15"
+              required
+            >
+            <span matTextPrefix>$&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Parts/Repairs</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="partsPrice"
+              name="partsPrice"
+              placeholder="5"
+            >
+            <span matTextPrefix>$&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Sell Price</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="sellPrice"
+              name="sellPrice"
+              placeholder="75"
+              required
+            >
+            <span matTextPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="!isFormValid()"
+          class="add-button"
+        >
+          <mat-icon>add</mat-icon>
+          Add Record
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Records Table -->
+  @if (records().length > 0) {
+    <mat-card class="records-table-card">
+      <mat-card-header>
+        <mat-card-title>All Flips</mat-card-title>
+        <div class="total-profit">
+          Total Profit: <span class="profit-amount">{{ getTotalProfit() | currency }}</span>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="records()" class="records-table">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let record">{{ record.date | date:'short' }}</td>
+          </ng-container>
+
+          <!-- Item Name Column -->
+          <ng-container matColumnDef="itemName">
+            <th mat-header-cell *matHeaderCellDef>Item</th>
+            <td mat-cell *matCellDef="let record">{{ record.itemName }}</td>
+          </ng-container>
+
+          <!-- Buy Price Column -->
+          <ng-container matColumnDef="buyPrice">
+            <th mat-header-cell *matHeaderCellDef>Buy</th>
+            <td mat-cell *matCellDef="let record">{{ record.buyPrice | currency }}</td>
+          </ng-container>
+
+          <!-- Parts Price Column -->
+          <ng-container matColumnDef="partsPrice">
+            <th mat-header-cell *matHeaderCellDef>Parts</th>
+            <td mat-cell *matCellDef="let record">{{ record.partsPrice | currency }}</td>
+          </ng-container>
+
+          <!-- Sell Price Column -->
+          <ng-container matColumnDef="sellPrice">
+            <th mat-header-cell *matHeaderCellDef>Sell</th>
+            <td mat-cell *matCellDef="let record">{{ record.sellPrice | currency }}</td>
+          </ng-container>
+
+          <!-- Profit Column -->
+          <ng-container matColumnDef="profit">
+            <th mat-header-cell *matHeaderCellDef>Profit</th>
+            <td mat-cell *matCellDef="let record" [class.positive]="record.profit > 0" [class.negative]="record.profit < 0">
+              {{ record.profit | currency }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let record">
+              <button mat-icon-button color="warn" (click)="deleteRecord(record.id)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="empty-state">
+      <mat-icon>inventory_2</mat-icon>
+      <h2>No flips yet</h2>
+      <p>Add your first flip above to start tracking your profits!</p>
+    </mat-card>
+  }
+</div>

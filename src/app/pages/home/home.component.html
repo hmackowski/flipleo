@@ -1,0 +1,89 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Turn Hidden Gems into Profit</h1>
+      <p class="hero-subtitle">
+        Discover, track, and execute profitable flips. From electronics to collectibles, Flipleo
+        helps you find deals and maximize returns.
+      </p>
+      <button mat-raised-button color="primary" class="cta-button" (click)="startFlipping()">
+        Start Flipping
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>search</mat-icon>
+        </div>
+        <h3>1. Find Deals</h3>
+        <p>Scout marketplaces, garage sales, and online platforms for underpriced items</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>shopping_cart</mat-icon>
+        </div>
+        <h3>2. Buy Low</h3>
+        <p>Purchase items below market value with confidence using our pricing insights</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <h3>3. Flip High</h3>
+        <p>Resell at market price and track your profits in real-time</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Deals -->
+  <section class="example-deals">
+    <h2>Potential Flips</h2>
+    <div class="deals-grid">
+      @for (deal of exampleDeals; track deal.title) {
+        <mat-card class="deal-card">
+          <mat-card-header>
+            <div class="deal-icon">{{ deal.image }}</div>
+            <mat-card-title>{{ deal.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="price-row">
+              <span class="label">Buy:</span>
+              <span class="buy-price">${{ deal.buyPrice }}</span>
+            </div>
+            <div class="price-row">
+              <span class="label">Sell:</span>
+              <span class="sell-price">${{ deal.sellPrice }}</span>
+            </div>
+            <div class="profit-row">
+              <span class="profit-amount">${{ deal.profit }} profit</span>
+              <span class="profit-percent">{{ deal.profitPercent }}%</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="stat">
+      <h3>Track Every Deal</h3>
+      <p>Monitor purchases, sales, and profits in one place</p>
+    </div>
+    <div class="stat">
+      <h3>Calculate ROI</h3>
+      <p>Automatic profit calculations and margin tracking</p>
+    </div>
+    <div class="stat">
+      <h3>Build Your Business</h3>
+      <p>Scale from side hustle to full-time flipping</p>
+    </div>
+  </section>
+</div>

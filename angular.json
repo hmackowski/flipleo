@@ -5,7 +5,11 @@
   "projects": {
     "flipleo": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -21,11 +25,13 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/custom-theme.scss",
+              "src/styles.scss"
             ]
           },
           "configurations": {
@@ -78,11 +84,12 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ]
           }
         }

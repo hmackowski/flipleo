@@ -1,0 +1,56 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Left side (logo + name) */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+}
+
+/* CENTER the nav links */
+.nav-links {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Optional styling for links */
+.nav-links a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Logo size */
+.logo {
+  height: 40px;
+}
+
+/* Right side (login/user) */
+.nav-right {
+  min-width: 200px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .user-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+  }
+}
