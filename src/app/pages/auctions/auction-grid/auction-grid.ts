@@ -50,7 +50,7 @@ export class AuctionGrid {
   deleteAuction = output<number>();
   openLink = output<string>();
 
-  displayedColumns = ['name', 'currentPrice', 'startTime', 'countdown', 'link', 'actions'];
+  displayedColumns = ['name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
 
   onDeleteAuction(id: number) {
     this.deleteAuction.emit(id);

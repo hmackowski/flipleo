@@ -5,7 +5,8 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { Auction } from '../../../models/auction.model';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {NgForOf} from '@angular/common';
+import {MatOption, MatSelect} from '@angular/material/select';
 
 @Component({
   selector: 'app-auction-create-dialog',
@@ -14,14 +15,13 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/mat
     FormsModule,
     MatButton,
     MatIcon,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardContent,
     MatFormField,
     MatInput,
     MatLabel,
-    MatPrefix
+    MatPrefix,
+    MatSelect,
+    MatOption,
+    NgForOf
   ],
   templateUrl: './auction-create-dialog.html',
   styleUrls: ['./auction-create-dialog.scss'],
@@ -34,6 +34,8 @@ export class AuctionCreateDialog {
   auctionLink = signal('');
   endTime = signal('');
   notes = signal('');
+  auctionSite = signal('');
+  auctionSites = ['eBay', 'Goodwill']
 
   isFormValid(): boolean {
     return this.itemName().trim() !== '' &&
@@ -54,6 +56,7 @@ export class AuctionCreateDialog {
       startTime: new Date(),
       currentPrice: this.currentPrice() || 0,
       link: this.auctionLink(),
+      auctionSite: this.auctionSite(),
       endTime: new Date(this.endTime()),
       notes: this.notes().trim() ? this.notes() : undefined,
     };

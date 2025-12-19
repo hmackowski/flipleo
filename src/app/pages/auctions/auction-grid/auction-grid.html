@@ -43,6 +43,15 @@
           </td>
         </ng-container>
 
+        <!-- Auction Site Column -->
+        <ng-container matColumnDef="auction_site">
+          <th mat-header-cell *matHeaderCellDef>Auction Site</th>
+          <td mat-cell *matCellDef="let auction">
+            {{ auction.auctionSite }}
+          </td>
+        </ng-container>
+
+
         <!-- Link Column -->
         <ng-container matColumnDef="link">
           <th mat-header-cell *matHeaderCellDef>Link</th>
@@ -50,6 +59,13 @@
             <button mat-icon-button color="primary" (click)="onOpenLink(auction.link)" title="Open auction">
               <mat-icon>open_in_new</mat-icon>
             </button>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="notes">
+          <th mat-header-cell *matHeaderCellDef>Notes</th>
+          <td mat-cell *matCellDef="let auction">
+            {{ auction.notes}}
           </td>
         </ng-container>
 
