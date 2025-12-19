@@ -1,1 +1,96 @@
-<p>auctions works!</p>
+<div class="auctions-container">
+  <h1>Auction Tracker</h1>
+
+  <!-- Add Auction Form -->
+  <mat-card class="add-auction-card">
+    <mat-card-header>
+      <button mat-raised-button class="add-button" (click)="openCreateAuctionDialog()"><mat-icon>add</mat-icon> Auction</button>
+      <mat-card-title>Track New Auction</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <form (ngSubmit)="addAuction()" class="auction-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Item Name</mat-label>
+          <input
+            matInput
+            type="text"
+            [(ngModel)]="itemName"
+            name="itemName"
+            placeholder="e.g., Vintage Nintendo Console"
+            required
+          >
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Current Price</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="currentPrice"
+              name="currentPrice"
+              placeholder="150"
+              required
+            >
+            <span matTextPrefix>$&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="flex-2">
+            <mat-label>Auction Link</mat-label>
+            <input
+              matInput
+              type="url"
+              [(ngModel)]="auctionLink"
+              name="auctionLink"
+              placeholder="https://ebay.com/item/..."
+              required
+            >
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>End Date/Time</mat-label>
+            <input
+              matInput
+              type="datetime-local"
+              [(ngModel)]="endTime"
+              name="endTime"
+              required
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="flex-2">
+            <mat-label>Notes (Optional)</mat-label>
+            <input
+              matInput
+              type="text"
+              [(ngModel)]="notes"
+              name="notes"
+              placeholder="Condition, shipping, etc."
+            >
+          </mat-form-field>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="!isFormValid()"
+          class="add-button"
+        >
+          <mat-icon>add</mat-icon>
+          Track Auction
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Auctions Grid -->
+  <app-auction-grid
+    [auctions]="auctions()"
+    (deleteAuction)="deleteAuction($event)"
+    (openLink)="openLink($event)"
+  ></app-auction-grid>
+</div>

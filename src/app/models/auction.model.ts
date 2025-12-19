@@ -1,7 +1,9 @@
 export interface Auction {
+  id: number;
   name: string;
-  time: Date;
-  price: number;
+  startTime: Date;
+  currentPrice: number;
   link: string;
   endTime: Date;
+  notes?: string;
 }

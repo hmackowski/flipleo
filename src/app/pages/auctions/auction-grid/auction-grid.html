@@ -1,0 +1,77 @@
+@if (auctions().length > 0) {
+  <mat-card class="auctions-table-card">
+    <mat-card-header>
+      <mat-card-title>Tracked Auctions ({{ auctions().length }})</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="aucs" class="auctions-table">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Item</th>
+          <td mat-cell *matCellDef="let auction">
+            <div class="item-cell">
+              <strong>{{ auction.name }}</strong>
+              @if (auction.notes) {
+                <span class="notes">{{ auction.notes }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Current Price Column -->
+        <ng-container matColumnDef="currentPrice">
+          <th mat-header-cell *matHeaderCellDef>Current Price</th>
+          <td mat-cell *matCellDef="let auction">{{ auction.currentPrice | currency }}</td>
+        </ng-container>
+
+        <!-- Start Time Column -->
+        <ng-container matColumnDef="startTime">
+          <th mat-header-cell *matHeaderCellDef>Started</th>
+          <td mat-cell *matCellDef="let auction">{{ auction.startTime | date:'short' }}</td>
+        </ng-container>
+
+        <!-- Countdown Column -->
+        <ng-container matColumnDef="countdown">
+          <th mat-header-cell *matHeaderCellDef>Time Remaining</th>
+          <td mat-cell *matCellDef="let auction"
+              [class.ended]="isAuctionEnded(auction.endTime)"
+              [class.within-3-hours]="isEndingWithin3Hours(auction.endTime)">
+            <div class="countdown-cell">
+              <div class="countdown-timer">{{ getCountdown(auction.endTime) }}</div>
+              <div class="end-date">{{ auction.endTime | date:'short' }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Link Column -->
+        <ng-container matColumnDef="link">
+          <th mat-header-cell *matHeaderCellDef>Link</th>
+          <td mat-cell *matCellDef="let auction">
+            <button mat-icon-button color="primary" (click)="onOpenLink(auction.link)" title="Open auction">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let auction">
+            <button mat-icon-button color="warn" (click)="onDeleteAuction(auction.id)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+} @else {
+  <mat-card class="empty-state">
+    <mat-icon>gavel</mat-icon>
+    <h2>No auctions tracked yet</h2>
+    <p>Start tracking auctions to monitor prices and end times!</p>
+  </mat-card>
+}
