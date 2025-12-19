@@ -1,14 +1,22 @@
 <nav class="navbar">
   <div class="nav-left">
-    <img src="assets/flipleo.png" class="logo" alt="Flipleo logo">
-    <span class="brand">Flipleo</span>
+    <a routerLink="/" class="brand-link">
+      <img src="assets/flipleo.png" class="logo" alt="Flipleo logo">
+      <span class="brand">Flipleo</span>
+    </a>
   </div>
 
+
   <div class="nav-links">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-    <a routerLink="/app" routerLinkActive="active">App</a>
-    <a routerLink="/auctions" routerLinkActive="active">Auctions</a>
+    <a routerLink="/flips" routerLinkActive="active" class="nav-link">
+      Flips
+    </a>
+
+    <a routerLink="/auctions" routerLinkActive="active" class="nav-link">
+      Auctions
+    </a>
   </div>
+
 
   <div class="nav-right">
     @if (authService.isLoggedIn()) {

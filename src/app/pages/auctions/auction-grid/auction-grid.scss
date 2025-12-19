@@ -23,53 +23,50 @@
 
   td {
     font-size: 0.95rem;
+  }
 
-    &.ended {
-      .countdown-timer {
-        color: #999;
-        font-weight: 600;
-      }
+  /* Countdown status colors (class is on the td) */
+  td.ended .countdown-timer {
+    color: #999;
+    font-weight: 600;
+  }
+
+  td.within-3-hours .countdown-timer {
+    color: #f44336;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .item-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    strong {
+      font-size: 1rem;
     }
 
-    &.within-3-hours {
-      .countdown-timer {
-        color: #f44336;
-        font-weight: 700;
-        font-size: 1.1rem;
-      }
+    .notes {
+      font-size: 0.85rem;
+      color: #666;
+      font-style: italic;
+    }
+  }
+
+  .countdown-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .countdown-timer {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
     }
 
-    .item-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      strong {
-        font-size: 1rem;
-      }
-
-      .notes {
-        font-size: 0.85rem;
-        color: #666;
-        font-style: italic;
-      }
-    }
-
-    .countdown-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      .countdown-timer {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .end-date {
-        font-size: 0.85rem;
-        color: #666;
-      }
+    .end-date {
+      font-size: 0.85rem;
+      color: #666;
     }
   }
 

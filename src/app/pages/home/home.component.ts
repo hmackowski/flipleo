@@ -41,6 +41,6 @@ export class Home {
   ];
 
   startFlipping() {
-    this.router.navigate(['/app']);
+    this.router.navigate(['/flips']);
   }
 }

@@ -8,6 +8,6 @@ import {AuctionsComponent} from './pages/auctions/auctions.component';
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'login', component: Login },
-  { path: 'app', component: FlipRecords, canActivate: [authGuard] },
+  { path: 'flips', component: FlipRecords, canActivate: [authGuard] },
   { path: 'auctions', component: AuctionsComponent, canActivate: [authGuard] }
 ];

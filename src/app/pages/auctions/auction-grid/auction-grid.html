@@ -4,7 +4,7 @@
       <mat-card-title>Tracked Auctions ({{ auctions().length }})</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <table mat-table [dataSource]="aucs" class="auctions-table">
+      <table mat-table [dataSource]="auctions()" class="auctions-table">
         <!-- Name Column -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Item</th>

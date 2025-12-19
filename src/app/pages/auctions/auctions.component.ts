@@ -1,113 +1,89 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+
 import { Auction } from '../../models/auction.model';
 import { StorageService } from '../../services/storage.service';
 import { AuctionGrid } from './auction-grid/auction-grid';
+import { AuctionCreateDialog } from './auction-create-dialog/auction-create-dialog';
 
 @Component({
   selector: 'app-auctions',
+  standalone: true,
   imports: [
-    FormsModule,
     MatButton,
+    MatIcon,
     MatCard,
     MatCardContent,
     MatCardHeader,
     MatCardTitle,
-    MatFormField,
-    MatIcon,
-    MatInput,
-    MatLabel,
     AuctionGrid
   ],
   templateUrl: './auctions.component.html',
   styleUrl: './auctions.component.scss',
 })
 export class AuctionsComponent implements OnInit, OnDestroy {
-  // Form fields
-  itemName = signal('');
-  currentPrice = signal<number | null>(null);
-  auctionLink = signal('');
-  endTime = signal('');
-  notes = signal('');
-
-  // Records
   auctions = signal<Auction[]>([]);
   nextId = 1;
 
-  // Timer for countdown updates
   private countdownInterval?: ReturnType<typeof setInterval>;
 
-  constructor(private storageService: StorageService) {}
+  constructor(
+    private storageService: StorageService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.loadAuctions();
-    // Update countdown every second
+
     this.countdownInterval = setInterval(() => {
-      // Trigger change detection by updating the signal
       this.auctions.set([...this.auctions()]);
     }, 1000);
   }
 
   ngOnDestroy() {
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
+    if (this.countdownInterval) clearInterval(this.countdownInterval);
   }
 
   loadAuctions() {
     const storedAuctions = this.storageService.getAuctions();
     this.auctions.set(storedAuctions);
-    if (storedAuctions.length > 0) {
+    if (storedAuctions.length) {
       this.nextId = Math.max(...storedAuctions.map(a => a.id)) + 1;
     }
   }
 
-  addAuction() {
-    const newAuction: Auction = {
-      id: this.nextId++,
-      name: this.itemName(),
-      startTime: new Date(),
-      currentPrice: this.currentPrice() || 0,
-      link: this.auctionLink(),
-      endTime: new Date(this.endTime()),
-      notes: this.notes() || undefined
-    };
+  openCreateAuctionDialog() {
+    const ref = this.dialog.open(AuctionCreateDialog, {
+      width: '800px',
+      maxWidth: '95vw',
+      autoFocus: false,
+    });
 
-    this.auctions.update(auctions => [...auctions, newAuction]);
-    this.storageService.addAuction(newAuction);
+    ref.afterClosed().subscribe((data?: Omit<Auction, 'id'>) => {
+      if (!data) return;
 
-    // Reset form
-    this.itemName.set('');
-    this.currentPrice.set(null);
-    this.auctionLink.set('');
-    this.endTime.set('');
-    this.notes.set('');
+      const newAuction: Auction = {
+        id: this.nextId++,
+        ...data,
+      };
+
+      this.auctions.update(a => [...a, newAuction]);
+      this.storageService.addAuction(newAuction);
+    });
   }
 
   deleteAuction(id: number) {
     const index = this.auctions().findIndex(a => a.id === id);
     if (index !== -1) {
-      this.auctions.update(auctions => auctions.filter(a => a.id !== id));
+      this.auctions.update(a => a.filter(x => x.id !== id));
       this.storageService.deleteAuction(index);
     }
   }
 
-  isFormValid(): boolean {
-    return this.itemName().trim() !== '' &&
-           this.currentPrice() !== null &&
-           this.auctionLink().trim() !== '' &&
-           this.endTime().trim() !== '';
-  }
-
   openLink(link: string) {
     window.open(link, '_blank');
-  }
-
-  openCreateAuctionDialog(){
-
   }
 }
