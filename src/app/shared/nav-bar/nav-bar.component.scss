@@ -13,6 +13,12 @@
   align-items: center;
   gap: 10px;
   min-width: 200px;
+
+  .brand {
+    font-weight: 600;
+    font-size: 18px;
+    color: #001b31;
+  }
 }
 
 /* CENTER the nav links */
@@ -26,8 +32,17 @@
 /* Optional styling for links */
 .nav-links a {
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 550;
   font-size: 16px;
+  color: #001b31;
+
+  &:hover {
+    color: #001b31;
+  }
+
+  &:visited {
+    color: #001b31;
+  }
 }
 
 /* Logo size */
@@ -51,6 +66,6 @@
   .user-name {
     font-weight: 600;
     font-size: 16px;
-    color: #333;
+    color: #001b31;
   }
 }
