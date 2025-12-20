@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import {
   MatCell,
@@ -23,7 +23,6 @@ import { Auction } from '../../../models/auction.model';
   imports: [
     CurrencyPipe,
     DatePipe,
-    MatButton,
     MatCard,
     MatCardContent,
     MatCardHeader,

@@ -8,6 +8,10 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FlipRecord } from '../../models/flip-record.model';
+import {StorageService} from '../../services/storage.service';
+import {MatDialog} from '@angular/material/dialog';
+import {CreateAddOnDialog} from './create-add-on-dialog/create-add-on-dialog';
+import {Auction} from '../../models/auction.model';
 
 @Component({
   selector: 'app-flip-records',
@@ -38,6 +42,10 @@ export class FlipRecords {
 
   // Table columns
   displayedColumns = ['date', 'itemName', 'buyPrice', 'partsPrice', 'sellPrice', 'profit', 'actions'];
+  constructor(
+    private storageService: StorageService,
+    private dialog: MatDialog
+  ) {}
 
   addRecord() {
     const buy = this.buyPrice() || 0;
@@ -76,5 +84,16 @@ export class FlipRecords {
     return this.itemName().trim() !== '' &&
            this.buyPrice() !== null &&
            this.sellPrice() !== null;
+  }
+
+  openCreateAddOnDialog() {
+    const ref = this.dialog.open(CreateAddOnDialog, {
+      width: '800px',
+      maxWidth: '95vw',
+      autoFocus: false,
+    });
+
+    ref.afterClosed().subscribe((data?: Omit<Auction, 'id'>) => {
+    });
   }
 }

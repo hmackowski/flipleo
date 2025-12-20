@@ -2,9 +2,13 @@
   <h1>My Flip Records</h1>
 
   <!-- Add Record Form -->
+  <!-- Add Record Form -->
   <mat-card class="add-record-card">
     <mat-card-header>
       <mat-card-title>Add New Flip</mat-card-title>
+      <button mat-raised-button class="add-addon-button" (click)="openCreateAddOnDialog()">
+        <mat-icon>add</mat-icon> Add-On
+      </button>
     </mat-card-header>
     <mat-card-content>
       <form (ngSubmit)="addRecord()" class="record-form">

@@ -1,0 +1,45 @@
+/* styles/_dialog.scss */
+
+:host {
+  display: block;
+}
+
+/* Dialog title */
+h2[mat-dialog-title] {
+  padding: 32px 32px 0 32px;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Dialog content */
+div[mat-dialog-content] {
+  padding: 24px;
+}
+
+/* Dialog footer */
+div[mat-dialog-actions] {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Default dialog form layout */
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+}

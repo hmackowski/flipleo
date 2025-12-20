@@ -10,19 +10,6 @@ h1 {
   color: #333;
 }
 
-.add-record-card {
-  margin-bottom: 30px;
-
-  mat-card-header {
-    margin-bottom: 20px;
-
-    mat-card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-  }
-}
-
 .record-form {
   display: flex;
   flex-direction: column;
@@ -108,8 +95,9 @@ h1 {
     font-size: 80px;
     width: 80px;
     height: 80px;
-    margin-bottom: 20px;
     color: #ccc;
+    display: block;
+    margin: 0 auto 20px auto;
   }
 
   h2 {
@@ -139,3 +127,27 @@ h1 {
     font-size: 0.85rem;
   }
 }
+
+
+.add-record-card {
+  margin-bottom: 30px;
+
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    mat-card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .add-addon-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+

@@ -34,7 +34,12 @@
             "styles": [
               "src/custom-theme.scss",
               "src/styles.scss"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src"
+              ]
+            }
           },
           "configurations": {
             "production": {
