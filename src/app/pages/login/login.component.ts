@@ -37,7 +37,7 @@ export class Login {
 
     if (this.authService.login(this.username(), this.password())) {
       // Successful login - redirect to home page
-      this.router.navigate(['/app']);
+      this.router.navigate(['/flips']);
     } else {
       // Failed login
       this.errorMessage.set('Invalid username or password');

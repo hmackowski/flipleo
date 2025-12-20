@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "ng build --configuration production --base-href \"/\" && npx angular-cli-ghpages --branch gh-pages --dir dist/flipleo/browser --cname flipleo.com"
   },
   "prettier": {
     "printWidth": 100,
