@@ -106,7 +106,6 @@ export class AuctionCreateDialog implements OnInit {
     if(this.isEdit)
     {
       this.storageService.editAuction(result);
-      console.log(this.storageService.getAuctions());
       this.dialogRef.close();
     }
 

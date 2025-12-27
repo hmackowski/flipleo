@@ -55,6 +55,7 @@ export class AuctionGrid {
 
 
   constructor(private dialog: MatDialog) {}
+
   onDeleteAuction(id: number) {
     this.deleteAuction.emit(id);
   }
@@ -70,7 +71,6 @@ export class AuctionGrid {
     ref.afterClosed().subscribe((data?: Auction) => {
       if (!data) return;
       this.editAuction.emit(data);
-      console.log(this.auctions());
     });
   }
 
