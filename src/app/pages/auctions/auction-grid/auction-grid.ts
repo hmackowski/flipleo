@@ -16,6 +16,8 @@ import {
 } from '@angular/material/table';
 import { MatIcon } from '@angular/material/icon';
 import { Auction } from '../../../models/auction.model';
+import {MatDialog} from '@angular/material/dialog';
+import {AuctionCreateDialog} from '../auction-create-dialog/auction-create-dialog';
 
 @Component({
   selector: 'app-auction-grid',
@@ -48,11 +50,28 @@ export class AuctionGrid {
 
   deleteAuction = output<number>();
   openLink = output<string>();
-
+  editAuction = output<Auction>();
   displayedColumns = ['name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
 
+
+  constructor(private dialog: MatDialog) {}
   onDeleteAuction(id: number) {
     this.deleteAuction.emit(id);
+  }
+
+  onEditAuction(auction: Auction) {
+    const ref = this.dialog.open(AuctionCreateDialog, {
+      width: '800px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      data: auction,
+    });
+
+    ref.afterClosed().subscribe((data?: Auction) => {
+      if (!data) return; // user cancelled
+
+      this.editAuction.emit(data);
+    });
   }
 
   onOpenLink(link: string) {

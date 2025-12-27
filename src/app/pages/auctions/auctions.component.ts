@@ -83,6 +83,18 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     }
   }
 
+  editAuction(updatedAuction: Auction) {
+    const index = this.auctions().findIndex(a => a.id === updatedAuction.id);
+    if (index !== -1) {
+      this.auctions.update(a => {
+        const updated = [...a];
+        updated[index] = updatedAuction;
+        return updated;
+      });
+      this.storageService.updateAuction(index, updatedAuction);
+    }
+  }
+
   openLink(link: string) {
     window.open(link, '_blank');
   }

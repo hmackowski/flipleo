@@ -1,14 +1,38 @@
-<h2 mat-dialog-title>Dialog Title</h2>
+<h2 mat-dialog-title>Create Add-On</h2>
 
 <div mat-dialog-content>
-  <form class="dialog-form">
+  <form (ngSubmit)="save()" class="auction-form">
     <!-- form fields go here -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Add-On Name</mat-label>
+      <input matInput type="text"
+             [ngModel]="addOnName()" (ngModelChange)="addOnName.set($event)"
+             name="itemName" required>
+    </mat-form-field>
+
+    <div class="form-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Add-On Price</mat-label>
+      <input matInput type="number"
+             [ngModel]="addOnPrice()" (ngModelChange)="addOnPrice.set($event)"
+             name="itemName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="flex-2">
+      <mat-label>Auction Link</mat-label>
+      <input matInput type="url"
+             [ngModel]="addOnLink()" (ngModelChange)="addOnLink.set($event)"
+             name="auctionLink" required>
+    </mat-form-field>
+
+    </div>
   </form>
 </div>
 
 <div mat-dialog-actions align="end">
   <button mat-button type="button" (click)="cancel()">Cancel</button>
   <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="!isFormValid()">
-    Confirm
+    <mat-icon>add</mat-icon>
+    Create Add-On
   </button>
 </div>
