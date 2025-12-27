@@ -68,9 +68,9 @@ export class AuctionGrid {
     });
 
     ref.afterClosed().subscribe((data?: Auction) => {
-      if (!data) return; // user cancelled
-
+      if (!data) return;
       this.editAuction.emit(data);
+      console.log(this.auctions());
     });
   }
 

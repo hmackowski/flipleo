@@ -7,4 +7,5 @@ export interface Auction {
   link: string;
   endTime: Date;
   notes?: string;
+  imgURL?: string;
 }

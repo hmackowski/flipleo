@@ -56,6 +56,14 @@ export class StorageService {
     this.saveAuctions(auctions);
   }
 
+  editAuction(auction: Auction): void {
+    const auctions = this.getAuctions();
+    const index = auctions.findIndex(a => a.id === auction.id);
+    if (index !== -1) {
+      auctions[index] = auction;
+    }
+  }
+
   updateAuction(index: number, auction: Auction): void {
     const auctions = this.getAuctions();
     if (index >= 0 && index < auctions.length) {

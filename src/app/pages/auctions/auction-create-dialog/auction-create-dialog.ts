@@ -1,4 +1,4 @@
-import {Component, Inject, inject, signal} from '@angular/core';
+import {Component, Inject, inject, OnInit, signal} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
@@ -9,6 +9,8 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSuffix } from '@angular/material/form-field';
+import {StorageService} from 'app/services/storage.service';
+
 
 
 @Component({
@@ -32,7 +34,7 @@ import { MatSuffix } from '@angular/material/form-field';
   templateUrl: './auction-create-dialog.html',
   styleUrls: ['./auction-create-dialog.scss'],
 })
-export class AuctionCreateDialog {
+export class AuctionCreateDialog implements OnInit {
   private dialogRef = inject(MatDialogRef<AuctionCreateDialog>);
 
 
@@ -45,10 +47,20 @@ export class AuctionCreateDialog {
   auctionSite = signal('');
   auctionSites = ['eBay', 'Goodwill']
   saveText = 'Track Auction'
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Auction) {}
+  isEdit: boolean = false;
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: Auction,
+              private storageService: StorageService) {}
 
   ngOnInit() {
     if(this.data){
+      this.isEdit = true;
+      this.setFormData();
+    }
+  }
+
+  setFormData() {
+    {
       this.saveText = 'Update Auction'
       this.itemName.set(this.data.name);
       this.currentPrice.set(this.data.currentPrice);
@@ -90,6 +102,13 @@ export class AuctionCreateDialog {
       endTime: endDateTime,
       notes: this.notes().trim() ? this.notes() : undefined,
     };
+
+    if(this.isEdit)
+    {
+      this.storageService.editAuction(result);
+      console.log(this.storageService.getAuctions());
+      this.dialogRef.close();
+    }
 
     this.dialogRef.close(result);
   }
