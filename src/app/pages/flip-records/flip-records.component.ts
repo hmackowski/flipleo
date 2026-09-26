@@ -1,9 +1,8 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
@@ -17,6 +16,7 @@ import { SelectAddOnsDialog } from './select-add-ons-dialog/select-add-ons-dialo
 import { EditFlipRecordDialog } from './edit-flip-record-dialog/edit-flip-record-dialog';
 import { fromPreset } from './add-on.utils';
 import { FlipRecordCards } from './flip-record-cards/flip-record-cards';
+import { StatTileComponent } from '@app/shared/components/stat-tile/stat-tile.component';
 
 type ViewMode = 'table' | 'cards';
 const VIEW_MODE_KEY = 'flipleo_flips_view';
@@ -25,13 +25,14 @@ const VIEW_MODE_KEY = 'flipleo_flips_view';
   selector: 'app-flip-records',
   imports: [
     MatButtonModule,
-    MatCardModule,
     MatTableModule,
     MatIconModule,
     CurrencyPipe,
     DatePipe,
+    PercentPipe,
     MatButtonToggleModule,
-    FlipRecordCards
+    FlipRecordCards,
+    StatTileComponent
   ],
   templateUrl: './flip-records.component.html',
   styleUrl: './flip-records.component.scss'
@@ -53,8 +54,46 @@ export class FlipRecords implements OnInit {
 
   readonly FlipStatusIds = FlipStatusIds;
 
+  // ---------- Summary tiles ----------
+  private soldRecords = computed(() => this.records().filter((r) => r.flipStatusId === FlipStatusIds.Sold));
+  soldCount = computed(() => this.soldRecords().length);
+
+  /** Overall ROI on sold flips: total profit / total cost (buy + parts). */
+  averageRoi = computed<number | null>(() => {
+    const sold = this.soldRecords();
+    const cost = sold.reduce((sum, r) => sum + r.buyPrice + (r.partsPrice ?? 0), 0);
+    return sold.length && cost > 0 ? this.totalProfit() / cost : null;
+  });
+
+  // ---------- Filters (status chips + search) ----------
+  readonly statusFilters = [
+    { id: FlipStatusIds.Bought, name: 'Bought' },
+    { id: FlipStatusIds.Listed, name: 'Listed' },
+    { id: FlipStatusIds.Sold, name: 'Sold' },
+  ];
+  statusFilter = signal<'all' | number>('all');
+  search = signal('');
+
+  filteredRecords = computed(() => {
+    const status = this.statusFilter();
+    const term = this.search().trim().toLowerCase();
+    return this.records().filter((r) =>
+      (status === 'all' || r.flipStatusId === status) &&
+      (!term || r.itemName.toLowerCase().includes(term) || r.addOns.some((a) => a.name.toLowerCase().includes(term)))
+    );
+  });
+
+  statusCount(statusId: number): number {
+    return this.records().filter((r) => r.flipStatusId === statusId).length;
+  }
+
+  clearFilters() {
+    this.statusFilter.set('all');
+    this.search.set('');
+  }
+
   // Table columns
-  displayedColumns = ['expand', 'image', 'date', 'status', 'itemName', 'buyPrice', 'partsPrice', 'sellPrice', 'profit', 'actions'];
+  displayedColumns = ['expand', 'item', 'status', 'buyPrice', 'partsPrice', 'sellPrice', 'profit', 'actions'];
 
   // Table or card view (remembered in this browser, it's just a display preference)
   viewMode = signal<ViewMode>(loadViewMode());
@@ -232,8 +271,8 @@ export class FlipRecords implements OnInit {
 
 function loadViewMode(): ViewMode {
   try {
-    return localStorage.getItem(VIEW_MODE_KEY) === 'cards' ? 'cards' : 'table';
+    return localStorage.getItem(VIEW_MODE_KEY) === 'table' ? 'table' : 'cards';
   } catch {
-    return 'table';
+    return 'cards';
   }
 }

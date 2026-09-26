@@ -1,6 +1,4 @@
-/* app.component.css */
+/* The page components set their own width/padding (see .fl-page in styles.scss) */
 .main-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: calc(100vh - 64px);
 }

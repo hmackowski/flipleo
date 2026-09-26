@@ -1,6 +1,6 @@
-import { Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed, signal, OnInit, OnDestroy } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,6 +12,8 @@ import { ConfirmDialogService } from '@app/core/services/confirm-dialog.service'
 import { EditFlipRecordDialog } from '../flip-records/edit-flip-record-dialog/edit-flip-record-dialog';
 import { AuctionGrid } from './auction-grid/auction-grid';
 import { AuctionCreateDialog } from './auction-create-dialog/auction-create-dialog';
+import { StatTileComponent } from '@app/shared/components/stat-tile/stat-tile.component';
+import { isAuctionEnded, isEndingWithin24Hours } from './auction-time.utils';
 
 @Component({
   selector: 'app-auctions',
@@ -19,17 +21,20 @@ import { AuctionCreateDialog } from './auction-create-dialog/auction-create-dial
   imports: [
     MatButton,
     MatIcon,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
-    AuctionGrid
+    CurrencyPipe,
+    AuctionGrid,
+    StatTileComponent
   ],
   templateUrl: './auctions.component.html',
   styleUrl: './auctions.component.scss',
 })
 export class AuctionsComponent implements OnInit, OnDestroy {
   auctions = signal<Auction[]>([]);
+
+  // Summary tiles (recalculated every second along with the countdowns)
+  activeAuctions = computed(() => this.auctions().filter((a) => !isAuctionEnded(a.endTime)));
+  endingSoonCount = computed(() => this.auctions().filter((a) => isEndingWithin24Hours(a.endTime)).length);
+  activeValue = computed(() => this.activeAuctions().reduce((sum, a) => sum + a.currentPrice, 0));
 
   private countdownInterval?: ReturnType<typeof setInterval>;
 

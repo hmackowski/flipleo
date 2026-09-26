@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +17,9 @@ import { AuthService } from '@app/core/services/auth.service';
 })
 export class NavBar {
   isFeatureActive: boolean = false;
+
+  /** First letter of the display name, for the avatar circle. */
+  initial = computed(() => (this.authService.userName().trim()[0] ?? '?').toUpperCase());
 
   constructor(
     public authService: AuthService,

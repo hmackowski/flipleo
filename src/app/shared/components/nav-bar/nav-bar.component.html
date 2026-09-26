@@ -1,43 +1,38 @@
 <nav class="navbar">
-  <div class="nav-left">
-    <!-- Signed in: the logo takes you to your flips; signed out: the landing page -->
-    <a [routerLink]="authService.isLoggedIn() ? '/flips' : '/'" class="brand-link">
-      <img src="assets/flipleo.png" class="logo" alt="Flipleo logo">
-      <span class="brand">Flipleo</span>
-    </a>
-  </div>
+  <!-- Signed in: the logo takes you to your flips; signed out: the landing page -->
+  <a [routerLink]="authService.isLoggedIn() ? '/flips' : '/'" class="brand-link">
+    <img src="assets/flipleo.png" class="logo" alt="Flipleo logo">
+    <span class="brand">Flipleo</span>
+  </a>
 
-
-  <div class="nav-links">
-    <a routerLink="/flips" routerLinkActive="active" class="nav-link">
-      Flips
-    </a>
-
-    <a routerLink="/auctions" routerLinkActive="active" class="nav-link">
-      Auctions
-    </a>
-
-    @if(isFeatureActive){
-      <a routerLink="/collection" routerLinkActive="active" class="nav-link">
-        Collection
+  @if (authService.isLoggedIn()) {
+    <div class="nav-links">
+      <a routerLink="/flips" routerLinkActive="active" class="nav-link">
+        <mat-icon>inventory_2</mat-icon> Flips
       </a>
-    }
-
-  </div>
-
+      <a routerLink="/auctions" routerLinkActive="active" class="nav-link">
+        <mat-icon>gavel</mat-icon> Auctions
+      </a>
+      @if (isFeatureActive) {
+        <a routerLink="/collection" routerLinkActive="active" class="nav-link">
+          <mat-icon>collections</mat-icon> Collection
+        </a>
+      }
+    </div>
+  }
 
   <div class="nav-right">
     @if (authService.isLoggedIn()) {
       <div class="user-info">
+        <span class="avatar" aria-hidden="true">{{ initial() }}</span>
         <span class="user-name">{{ authService.userName() }}</span>
-        <button mat-icon-button (click)="logout()" title="Logout">
+        <button mat-icon-button (click)="logout()" title="Log out" aria-label="Log out">
           <mat-icon>logout</mat-icon>
         </button>
       </div>
     } @else {
-      <button mat-raised-button color="primary" (click)="navigateToLogin()">
-        Login
-      </button>
+      <a mat-button routerLink="/login">Sign in</a>
+      <a mat-flat-button class="fl-primary-button" routerLink="/login" [queryParams]="{ mode: 'register' }">Get started</a>
     }
   </div>
 </nav>

@@ -1,6 +1,7 @@
-<div class="card-grid">
+<div class="fl-card-grid">
   @for (record of records(); track record.id) {
-    <div class="flip-card">
+    <article class="flip-card" tabindex="0" (click)="edit.emit(record)" (keydown.enter)="edit.emit(record)"
+             [attr.aria-label]="'Edit ' + record.itemName">
       <!-- Main image (placeholder when there's no link or it won't load) -->
       <div class="flip-image">
         @if (record.imageUrl && !brokenImages().has(record.id!)) {
@@ -8,51 +9,34 @@
         } @else {
           <mat-icon class="placeholder">image</mat-icon>
         }
-        <span class="status-badge" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
-      </div>
-      <div class="card-top">
-        <div>
-          <div class="item-name">{{ record.itemName }}</div>
-          <div class="flip-date">{{ record.flipDate | date:'mediumDate' }}</div>
-        </div>
-        <div class="card-actions">
-          <button mat-icon-button type="button" (click)="edit.emit(record)" title="Edit flip">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button type="button" color="warn" (click)="delete.emit(record)" title="Delete flip">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+        <span class="fl-pill status" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
+
+        <button mat-icon-button type="button" class="menu-button" [matMenuTriggerFor]="menu"
+                (click)="$event.stopPropagation()" aria-label="Flip actions">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" xPosition="before">
+          <button mat-menu-item (click)="edit.emit(record)"><mat-icon>edit</mat-icon> Edit</button>
+          <button mat-menu-item (click)="addAddOns.emit(record)"><mat-icon>playlist_add</mat-icon> Add-Ons</button>
+          <button mat-menu-item class="danger" (click)="delete.emit(record)"><mat-icon>delete_outline</mat-icon> Delete</button>
+        </mat-menu>
       </div>
 
-      <div class="numbers">
-        <div><span class="label">Buy</span><span>{{ record.buyPrice | currency }}</span></div>
-        <div><span class="label">Parts</span><span>{{ record.partsPrice | currency }}</span></div>
-        <div>
-          <span class="label">{{ record.flipStatusId === FlipStatusIds.Sold ? 'Sell' : 'Asking' }}</span>
-          <span>{{ record.sellPrice != null ? (record.sellPrice | currency) : '—' }}</span>
+      <div class="body">
+        <div class="title">
+          <h3 [title]="record.itemName">{{ record.itemName }}</h3>
+          <span class="date">Bought {{ record.flipDate | date:'mediumDate' }}</span>
         </div>
-      </div>
 
-      <div class="profit-row">
-        @if (record.profit != null) {
-          <span class="profit" [class.positive]="record.profit > 0" [class.negative]="record.profit < 0">
-            {{ record.profit | currency }}
-          </span>
-          @if (roi(record) !== null) {
-            <span class="roi" [class.negative]="roi(record)! < 0">{{ roi(record) | percent:'1.0-1' }} ROI</span>
-          }
-        } @else if (expectedProfit(record) !== null) {
-          <span class="expected" title="Not counted in Total Profit until it's marked Sold">
-            {{ expectedProfit(record) | currency }}
-            <span class="expected-label">expected</span>
-          </span>
-        } @else {
-          <span class="not-sold">Not sold yet · {{ (record.buyPrice + (record.partsPrice ?? 0)) | currency }} in</span>
-        }
-      </div>
+        <dl class="numbers">
+          <div><dt>Buy</dt><dd>{{ record.buyPrice | currency }}</dd></div>
+          <div><dt>Parts</dt><dd>{{ record.partsPrice | currency }}</dd></div>
+          <div>
+            <dt>{{ record.flipStatusId === FlipStatusIds.Sold ? 'Sold' : 'Asking' }}</dt>
+            <dd>{{ record.sellPrice != null ? (record.sellPrice | currency) : '—' }}</dd>
+          </div>
+        </dl>
 
-      <div class="add-ons">
         @if (record.addOns.length > 0) {
           <div class="add-on-list">
             @for (addOn of record.addOns; track addOn.id) {
@@ -64,13 +48,35 @@
               </span>
             }
           </div>
-        } @else {
-          <span class="no-add-ons">No add-ons</span>
         }
-        <button mat-button type="button" class="add-button" (click)="addAddOns.emit(record)">
-          <mat-icon>playlist_add</mat-icon> Add-Ons
-        </button>
       </div>
-    </div>
+
+      <footer class="profit-row">
+        @if (record.profit != null) {
+          <div>
+            <span class="caption">Profit</span>
+            <span class="profit" [class.fl-money-positive]="record.profit > 0" [class.fl-money-negative]="record.profit < 0">
+              {{ record.profit | currency }}
+            </span>
+          </div>
+          @if (roi(record) !== null) {
+            <span class="fl-pill" [class.sold]="roi(record)! >= 0" [class.danger]="roi(record)! < 0">
+              {{ roi(record) | percent:'1.0-1' }} ROI
+            </span>
+          }
+        } @else if (expectedProfit(record) !== null) {
+          <div title="Not counted in Total Profit until it's marked Sold">
+            <span class="caption">Expected profit</span>
+            <span class="profit expected">{{ expectedProfit(record) | currency }}</span>
+          </div>
+        } @else {
+          <div>
+            <span class="caption">Invested</span>
+            <span class="profit expected">{{ (record.buyPrice + (record.partsPrice ?? 0)) | currency }}</span>
+          </div>
+          <span class="fl-pill muted">Not sold yet</span>
+        }
+      </footer>
+    </article>
   }
 </div>

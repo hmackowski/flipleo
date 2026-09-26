@@ -1,14 +1,15 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIconButton } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
 
 import { FlipRecord, FlipStatusIds } from '@app/shared/models';
 
-/** Card view of the flips (the alternative to the table). Actions are raised to the page. */
+/** Card view of the flips (the alternative to the table). Clicking a card edits it; the ⋮ menu has the rest. Actions are raised to the page. */
 @Component({
   selector: 'app-flip-record-cards',
-  imports: [CurrencyPipe, DatePipe, PercentPipe, MatButton, MatIconButton, MatIcon],
+  imports: [CurrencyPipe, DatePipe, PercentPipe, MatIconButton, MatIcon, MatMenuModule],
   templateUrl: './flip-record-cards.html',
   styleUrl: './flip-record-cards.scss',
 })

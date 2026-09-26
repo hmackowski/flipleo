@@ -1,16 +1,30 @@
-<div class="auctions-container">
-  <h1>Auction Tracker</h1>
-
-  <mat-card class="add-auction-card">
-    <mat-card-header>
-      <button mat-raised-button class="add-button" (click)="openCreateAuctionDialog()">
-        <mat-icon>add</mat-icon> Auction
+<div class="fl-page">
+  <header class="fl-page-header">
+    <div>
+      <h1>Auctions</h1>
+      <p class="fl-subtitle">Keep an eye on what you're bidding on. Won one? Turn it into a flip.</p>
+    </div>
+    <div class="fl-actions">
+      <button mat-flat-button class="fl-primary-button" type="button" (click)="openCreateAuctionDialog()">
+        <mat-icon>add</mat-icon> Track Auction
       </button>
-      <mat-card-title>Track New Auction</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </header>
+
+  <section class="stats">
+    <app-stat-tile label="Active" icon="gavel" tone="brand"
+                   [value]="'' + activeAuctions().length"
+                   [hint]="auctions().length + ' tracked in total'" />
+    <app-stat-tile label="Ending in 24 Hours" icon="timer" [tone]="endingSoonCount() > 0 ? 'danger' : 'neutral'"
+                   [value]="'' + endingSoonCount()"
+                   [hint]="endingSoonCount() > 0 ? 'Don’t miss them' : 'Nothing urgent'" />
+    <app-stat-tile label="Current Bids" icon="payments" tone="info"
+                   [value]="(activeValue() | currency) ?? ''"
+                   hint="Total of active auctions" />
+    <app-stat-tile label="Ended" icon="event_busy"
+                   [value]="'' + (auctions().length - activeAuctions().length)"
+                   hint="Won? Add them as flips" />
+  </section>
 
   <app-auction-grid
     [auctions]="auctions()"
@@ -18,5 +32,6 @@
     (editAuction)="editAuction($event)"
     (openLink)="openLink($event)"
     (createFlip)="createFlipFromAuction($event)"
+    (addAuction)="openCreateAuctionDialog()"
   ></app-auction-grid>
 </div>

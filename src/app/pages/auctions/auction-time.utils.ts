@@ -22,3 +22,8 @@ export function isEndingWithin3Hours(endTime: Date | string): boolean {
 export function isAuctionEnded(endTime: Date | string): boolean {
   return new Date(endTime).getTime() <= Date.now();
 }
+
+export function isEndingWithin24Hours(endTime: Date | string): boolean {
+  const diff = new Date(endTime).getTime() - Date.now();
+  return diff > 0 && diff <= 24 * 60 * 60 * 1000;
+}

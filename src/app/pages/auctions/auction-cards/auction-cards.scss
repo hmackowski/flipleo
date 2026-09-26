@@ -1,139 +1,104 @@
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
+// Grid + pills are global (.fl-card-grid, .fl-pill in styles.scss)
 
 .auction-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  transition: box-shadow 150ms ease;
+  overflow: hidden;
+  border: 1px solid var(--fl-border);
+  border-radius: var(--fl-radius);
+  background: var(--fl-surface);
+  box-shadow: var(--fl-shadow);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
+  &:hover { transform: translateY(-2px); box-shadow: var(--fl-shadow-hover); }
 
-  &.ended {
-    opacity: 0.7;
-  }
+  &.ended .auction-image img { filter: grayscale(0.6); opacity: 0.8; }
 }
 
 .auction-image {
   position: relative;
   height: 180px;
-  margin: -16px -16px 0;
-  border-radius: 12px 12px 0 0;
-  overflow: hidden;
-  background: #f1f3f4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  background: var(--fl-surface-muted);
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  .placeholder { width: 48px; height: 48px; font-size: 48px; color: var(--fl-text-faint); }
+
+  .fl-pill { position: absolute; box-shadow: var(--fl-shadow); }
+
+  .site { top: 12px; left: 12px; background: rgba(255, 255, 255, 0.95); color: var(--fl-text); }
+
+  .countdown {
+    bottom: 12px;
+    left: 12px;
+    background: rgba(15, 27, 42, 0.85);
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+
+    mat-icon { width: 14px; height: 14px; font-size: 14px; }
+
+    &.danger { background: var(--fl-danger); color: #fff; }
+    &.muted { background: rgba(255, 255, 255, 0.95); color: var(--fl-text-muted); }
   }
 
-  .placeholder {
-    width: 48px;
-    height: 48px;
-    font-size: 48px;
-    color: #c4c9cc;
-  }
-
-  .site-badge {
+  .menu-button {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    padding: 2px 10px;
-    border-radius: 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.92);
-    color: #333;
+    top: 6px;
+    right: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--fl-text);
   }
 }
 
-.card-top {
+.body {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 4px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px 12px;
 
-  .item-name {
-    font-weight: 600;
-    font-size: 1.05rem;
-    // two lines max, then "..."
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-
-  .card-actions {
-    display: flex;
-    flex-shrink: 0;
-    margin: -8px -8px 0 0;
-  }
 }
 
-.label {
+.caption {
   display: block;
-  font-size: 0.75rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fl-text-muted);
 }
 
 .price-row {
   display: flex;
-  justify-content: space-between;
   align-items: flex-end;
-  gap: 8px;
-
-  .price {
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-
-  .countdown {
-    text-align: right;
-
-    .timer {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    &.urgent .timer {
-      color: #f44336;
-      font-weight: 700;
-    }
-  }
-}
-
-.dates {
-  display: flex;
   justify-content: space-between;
   gap: 8px;
-  font-size: 0.8rem;
-  color: #888;
-}
 
-.won-button {
-  align-self: flex-start;
-  margin-top: auto; // keeps the button at the bottom when cards are different heights
+  .price { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; }
+  .ends { text-align: right; font-size: 0.85rem; font-weight: 600; }
 }
 
 .notes {
-  border-top: 1px solid #f0f0f0;
-  padding-top: 8px;
+  margin: 0;
   font-size: 0.85rem;
-  color: #666;
-  font-style: italic;
+  color: var(--fl-text-muted);
 }
+
+footer {
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--fl-border);
+
+  .won-button { width: 100%; border-radius: 999px; }
+}
+
+::ng-deep .mat-mdc-menu-item.danger { color: var(--fl-danger); }

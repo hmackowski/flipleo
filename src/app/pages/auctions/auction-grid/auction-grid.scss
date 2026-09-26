@@ -1,132 +1,65 @@
-.auctions-table-card {
-  mat-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+// Toolbar, chips, panels and pills are global (.fl-* in styles.scss)
 
-    mat-card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-  }
+.empty-first { margin-top: 28px; }
+
+.view-toggle {
+  border-radius: 999px;
+  background: var(--fl-surface);
 }
 
 .auctions-table {
   width: 100%;
 
-  th {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #333;
-  }
+  .num { text-align: right; }
+  .price { font-weight: 700; }
 
-  td {
-    font-size: 0.95rem;
-  }
+  tr.mat-mdc-row:hover { background: var(--fl-surface-muted); }
 
-  /* Countdown status colors (class is on the td) */
-  td.ended .countdown-timer {
-    color: #999;
-    font-weight: 600;
-  }
-
-  td.within-3-hours .countdown-timer {
-    color: #f44336;
-    font-weight: 700;
-    font-size: 1.1rem;
-  }
-
-  .item-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    strong {
-      font-size: 1rem;
-    }
-
-    .notes {
-      font-size: 0.85rem;
-      color: #666;
-      font-style: italic;
-    }
+  .actions-cell {
+    width: 176px;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--fl-text-muted);
   }
 
   .countdown-cell {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 
-    .countdown-timer {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .end-date {
-      font-size: 0.85rem;
-      color: #666;
-    }
+    .countdown-timer { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .end-date { font-size: 0.8rem; color: var(--fl-text-muted); }
   }
 
-  tr:hover {
-    background-color: #f5f5f5;
-  }
+  td.ended .countdown-timer { color: var(--fl-text-faint); }
+  td.within-3-hours .countdown-timer { color: var(--fl-danger); }
 }
 
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
+.item-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
 
-  mat-icon {
-    font-size: 80px;
-    width: 80px;
-    height: 80px;
-    color: #ccc;
-    display: block;
-    margin: 0 auto 20px auto;
-  }
+  .item-text { display: flex; flex-direction: column; min-width: 0; }
+  .item-name { font-weight: 600; }
+  .notes { font-size: 0.8rem; color: var(--fl-text-muted); }
+}
 
-  h2 {
-    font-size: 1.75rem;
-    margin: 0 0 10px 0;
-    color: #666;
-  }
+.auction-thumbnail {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--fl-surface-muted);
 
-  p {
-    font-size: 1.1rem;
-    margin: 0;
+  &.placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--fl-text-faint);
   }
 }
 
 @media (max-width: 768px) {
-  .auctions-table-card mat-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .auctions-table {
-    font-size: 0.85rem;
-  }
-}
-
-.auction-thumbnail {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  display: block;
-
-  &.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.06);
-    color: rgba(0, 0, 0, 0.3);
-    cursor: default;
-  }
+  .table-panel { overflow-x: auto; }
 }

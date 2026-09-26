@@ -2,6 +2,7 @@ import { Component, input, output, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { Auction } from '@app/shared/models';
 import { getCountdown, isAuctionEnded, isEndingWithin3Hours } from '../auction-time.utils';
@@ -9,7 +10,7 @@ import { getCountdown, isAuctionEnded, isEndingWithin3Hours } from '../auction-t
 /** Card view of the tracked auctions (the alternative to the table). Actions are raised to the grid. */
 @Component({
   selector: 'app-auction-cards',
-  imports: [CurrencyPipe, DatePipe, MatButton, MatIconButton, MatIcon],
+  imports: [CurrencyPipe, DatePipe, MatButton, MatIconButton, MatIcon, MatMenuModule],
   templateUrl: './auction-cards.html',
   styleUrl: './auction-cards.scss',
 })

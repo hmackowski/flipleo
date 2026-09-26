@@ -1,4 +1,238 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles: design tokens + layout helpers shared by every page.
+   Component styles stay in each component; anything reused across pages lives here
+   (global styles don't count toward the 4 kB per-component budget). */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ---------- Design tokens ----------
+:root {
+  --fl-bg: #f5f7f9;
+  --fl-surface: #ffffff;
+  --fl-surface-muted: #f1f4f6;
+  --fl-border: #e4e8ec;
+  --fl-text: #0f1b2a;
+  --fl-text-muted: #64748b;
+  --fl-text-faint: #94a3b8;
+
+  --fl-brand: #0b2239;          // navy from the logo
+  --fl-primary: var(--mat-sys-primary);
+  --fl-primary-soft: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  --fl-gradient: linear-gradient(135deg, #0b2239 0%, #0e5f6b 55%, #0e8a8f 100%);
+
+  --fl-success: #16a34a;
+  --fl-success-soft: #dcfce7;
+  --fl-danger: #dc2626;
+  --fl-danger-soft: #fee2e2;
+  --fl-warning: #c2410c;
+  --fl-warning-soft: #ffedd5;
+  --fl-info: #1d4ed8;
+  --fl-info-soft: #dbeafe;
+
+  --fl-radius: 14px;
+  --fl-radius-sm: 10px;
+  --fl-shadow: 0 1px 2px rgba(15, 27, 42, 0.04), 0 1px 3px rgba(15, 27, 42, 0.06);
+  --fl-shadow-hover: 0 10px 24px -8px rgba(15, 27, 42, 0.18);
+}
+
+// ---------- Page layout ----------
+.fl-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  color: var(--fl-text);
+}
+
+.fl-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.85rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .fl-subtitle {
+    margin: 4px 0 0;
+    color: var(--fl-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .fl-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+// Row of filter chips + search + view toggle above a list
+.fl-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 16px;
+}
+
+.fl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--fl-border);
+  border-radius: 999px;
+  background: var(--fl-surface);
+  color: var(--fl-text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms ease;
+
+  .fl-chip-count {
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--fl-surface-muted);
+    font-size: 0.75rem;
+  }
+
+  &:hover { border-color: var(--fl-text-faint); color: var(--fl-text); }
+
+  &.active {
+    border-color: var(--fl-brand);
+    background: var(--fl-brand);
+    color: #fff;
+
+    .fl-chip-count { background: rgba(255, 255, 255, 0.2); }
+  }
+}
+
+.fl-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 220px;
+  padding: 7px 12px;
+  border: 1px solid var(--fl-border);
+  border-radius: 999px;
+  background: var(--fl-surface);
+  color: var(--fl-text-muted);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  input {
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--fl-text);
+  }
+
+  &:focus-within { border-color: var(--fl-primary); }
+}
+
+.fl-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+// White rounded panel (tables, empty states)
+.fl-panel {
+  background: var(--fl-surface);
+  border: 1px solid var(--fl-border);
+  border-radius: var(--fl-radius);
+  box-shadow: var(--fl-shadow);
+  overflow: hidden;
+}
+
+// Material tables inside a panel: flatter, lighter header
+.fl-panel .mat-mdc-table {
+  background: transparent;
+
+  .mat-mdc-header-cell {
+    background: var(--fl-surface-muted);
+    color: var(--fl-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .mat-mdc-cell { color: var(--fl-text); border-bottom-color: var(--fl-border); }
+}
+
+.fl-empty {
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--fl-text-muted);
+
+  mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--fl-text-faint); }
+  h2 { margin: 12px 0 6px; color: var(--fl-text); font-size: 1.2rem; }
+  p { margin: 0 0 20px; }
+}
+
+// Status pills (Bought / Listed / Sold, auction states)
+.fl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--fl-info-soft);
+  color: var(--fl-info);
+
+  &.listed, &[data-status='2'] { background: var(--fl-warning-soft); color: var(--fl-warning); }
+  &.sold, &[data-status='3'] { background: var(--fl-success-soft); color: var(--fl-success); }
+  &.danger { background: var(--fl-danger-soft); color: var(--fl-danger); }
+  &.muted { background: var(--fl-surface-muted); color: var(--fl-text-muted); }
+}
+
+.fl-money-positive { color: var(--fl-success); }
+.fl-money-negative { color: var(--fl-danger); }
+.fl-muted { color: var(--fl-text-muted); }
+
+// Card grid used by the card views
+.fl-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
+}
+
+// Primary buttons: rounded, a bit bolder
+.mat-mdc-unelevated-button.fl-primary-button {
+  border-radius: 999px;
+  padding: 0 20px;
+  font-weight: 600;
+  background: var(--fl-brand);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .fl-page { padding: 20px 16px 48px; }
+  .fl-page-header h1 { font-size: 1.5rem; }
+  .fl-search { min-width: 0; flex: 1; }
+}

@@ -1,6 +1,6 @@
-<div class="card-grid">
+<div class="fl-card-grid">
   @for (auction of auctions(); track auction.id) {
-    <div class="auction-card" [class.ended]="isAuctionEnded(auction.endTime)">
+    <article class="auction-card" [class.ended]="isAuctionEnded(auction.endTime)">
       <!-- Main image (placeholder when there's no link or it won't load) -->
       <div class="auction-image">
         @if (auction.imageUrl && !brokenImages().has(auction.id)) {
@@ -9,49 +9,48 @@
           <mat-icon class="placeholder">image</mat-icon>
         }
         @if (auction.auctionSiteName) {
-          <span class="site-badge">{{ auction.auctionSiteName }}</span>
+          <span class="fl-pill site">{{ auction.auctionSiteName }}</span>
+        }
+        <span class="fl-pill countdown" [class.danger]="isEndingWithin3Hours(auction.endTime)"
+              [class.muted]="isAuctionEnded(auction.endTime)">
+          <mat-icon>schedule</mat-icon> {{ getCountdown(auction.endTime) }}
+        </span>
+
+        <button mat-icon-button type="button" class="menu-button" [matMenuTriggerFor]="menu" aria-label="Auction actions">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" xPosition="before">
+          <button mat-menu-item (click)="openLink.emit(auction.link)"><mat-icon>open_in_new</mat-icon> Open listing</button>
+          <button mat-menu-item (click)="edit.emit(auction)"><mat-icon>edit</mat-icon> Edit</button>
+          <button mat-menu-item class="danger" (click)="delete.emit(auction.id)"><mat-icon>delete_outline</mat-icon> Delete</button>
+        </mat-menu>
+      </div>
+
+      <div class="body">
+        <h3 [title]="auction.name">{{ auction.name }}</h3>
+
+        <div class="price-row">
+          <div>
+            <span class="caption">Current price</span>
+            <span class="price">{{ auction.currentPrice | currency }}</span>
+          </div>
+          <div class="ends">
+            <span class="caption">Ends</span>
+            <span>{{ auction.endTime | date:'MMM d, h:mm a' }}</span>
+          </div>
+        </div>
+
+        @if (auction.notes) {
+          <p class="notes">{{ auction.notes }}</p>
         }
       </div>
 
-      <div class="card-top">
-        <div class="item-name" [title]="auction.name">{{ auction.name }}</div>
-        <div class="card-actions">
-          <button mat-icon-button type="button" (click)="openLink.emit(auction.link)" title="Open auction">
-            <mat-icon>open_in_new</mat-icon>
-          </button>
-          <button mat-icon-button type="button" (click)="edit.emit(auction)" title="Edit auction">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button type="button" (click)="delete.emit(auction.id)" title="Delete auction">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <div class="price-row">
-        <div>
-          <span class="label">Current Price</span>
-          <span class="price">{{ auction.currentPrice | currency }}</span>
-        </div>
-        <div class="countdown" [class.urgent]="isEndingWithin3Hours(auction.endTime)">
-          <span class="label">Time Remaining</span>
-          <span class="timer">{{ getCountdown(auction.endTime) }}</span>
-        </div>
-      </div>
-
-      <div class="dates">
-        <span>Started {{ auction.startTime | date:'short' }}</span>
-        <span>Ends {{ auction.endTime | date:'short' }}</span>
-      </div>
-
-      @if (auction.notes) {
-        <div class="notes">{{ auction.notes }}</div>
-      }
-
-      <button mat-stroked-button type="button" class="won-button" (click)="createFlip.emit(auction)"
-              title="Won it? Start a flip from this auction">
-        <mat-icon>add_shopping_cart</mat-icon> Won it → Add Flip
-      </button>
-    </div>
+      <footer>
+        <button mat-stroked-button type="button" class="won-button" (click)="createFlip.emit(auction)"
+                title="Won it? Start a flip from this auction">
+          <mat-icon>add_shopping_cart</mat-icon> Won it → Add Flip
+        </button>
+      </footer>
+    </article>
   }
 </div>

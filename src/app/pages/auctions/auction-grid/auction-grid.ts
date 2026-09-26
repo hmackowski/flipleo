@@ -1,7 +1,6 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import {
   MatCell,
   MatCellDef,
@@ -20,7 +19,9 @@ import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-
 import { MatDialog } from '@angular/material/dialog';
 import { AuctionCreateDialog } from '../auction-create-dialog/auction-create-dialog';
 import { AuctionCards } from '../auction-cards/auction-cards';
-import { getCountdown, isAuctionEnded, isEndingWithin3Hours } from '../auction-time.utils';
+import { getCountdown, isAuctionEnded, isEndingWithin24Hours, isEndingWithin3Hours } from '../auction-time.utils';
+
+type AuctionFilter = 'all' | 'active' | 'ending-soon' | 'ended';
 
 type ViewMode = 'table' | 'cards';
 const VIEW_MODE_KEY = 'flipleo_auctions_view';
@@ -31,10 +32,6 @@ const VIEW_MODE_KEY = 'flipleo_auctions_view';
   imports: [
     CurrencyPipe,
     DatePipe,
-    MatCard,
-    MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
     MatCell,
     MatCellDef,
     MatColumnDef,
@@ -44,6 +41,7 @@ const VIEW_MODE_KEY = 'flipleo_auctions_view';
     MatHeaderRowDef,
     MatIcon,
     MatIconButton,
+    MatButton,
     MatRow,
     MatRowDef,
     MatTable,
@@ -60,8 +58,40 @@ export class AuctionGrid {
   deleteAuction = output<number>();
   openLink = output<string>();
   editAuction = output<Auction>();
+  addAuction = output<void>();
   createFlip = output<Auction>();
-  displayedColumns = ['image', 'name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
+  displayedColumns = ['item', 'auction_site', 'currentPrice', 'countdown', 'actions'];
+
+  // ---------- Filters (chips + search) ----------
+  readonly filterOptions: { value: AuctionFilter; label: string }[] = [
+    { value: 'all', label: 'All' },
+    { value: 'active', label: 'Active' },
+    { value: 'ending-soon', label: 'Ending in 24h' },
+    { value: 'ended', label: 'Ended' },
+  ];
+  filter = signal<AuctionFilter>('all');
+  search = signal('');
+
+  filteredAuctions = computed(() => {
+    const term = this.search().trim().toLowerCase();
+    return this.auctions().filter((a) =>
+      this.matchesFilter(a, this.filter()) &&
+      (!term || a.name.toLowerCase().includes(term) || (a.notes ?? '').toLowerCase().includes(term))
+    );
+  });
+
+  countFor(filter: AuctionFilter): number {
+    return this.auctions().filter((a) => this.matchesFilter(a, filter)).length;
+  }
+
+  private matchesFilter(auction: Auction, filter: AuctionFilter): boolean {
+    switch (filter) {
+      case 'active': return !isAuctionEnded(auction.endTime);
+      case 'ending-soon': return isEndingWithin24Hours(auction.endTime);
+      case 'ended': return isAuctionEnded(auction.endTime);
+      default: return true;
+    }
+  }
 
 
   // Table or card view (remembered in this browser, it's just a display preference)
@@ -119,8 +149,8 @@ export class AuctionGrid {
 
 function loadViewMode(): ViewMode {
   try {
-    return localStorage.getItem(VIEW_MODE_KEY) === 'cards' ? 'cards' : 'table';
+    return localStorage.getItem(VIEW_MODE_KEY) === 'table' ? 'table' : 'cards';
   } catch {
-    return 'table';
+    return 'cards';
   }
 }

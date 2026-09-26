@@ -1,53 +1,93 @@
-<div class="records-container">
-  <h1>My Flip Records</h1>
+<div class="fl-page">
+  <!-- Header: title + main action -->
+  <header class="fl-page-header">
+    <div>
+      <h1>Flips</h1>
+      <p class="fl-subtitle">Everything you've bought, listed and sold, in one place.</p>
+    </div>
+    <div class="fl-actions">
+      <button mat-flat-button class="fl-primary-button" type="button" (click)="openAddFlipDialog()">
+        <mat-icon>add</mat-icon> Add Flip
+      </button>
+    </div>
+  </header>
 
-  <mat-card class="records-table-card">
-    <mat-card-header>
-      <mat-card-title>All Flips</mat-card-title>
-      <div class="header-actions">
-        @if (records().length > 0) {
-          <div class="totals">
-            <div class="total-profit">
-              Total Profit: <span class="profit-amount">{{ totalProfit() | currency }}</span>
-            </div>
-            @if (unsoldCount() > 0) {
-              <div class="unsold-summary">
-                {{ unsoldCount() }} unsold · {{ unsoldCost() | currency }} invested
-              </div>
-            }
-          </div>
-          <mat-button-toggle-group [value]="viewMode()" (change)="setViewMode($event.value)"
-                                   hideSingleSelectionIndicator aria-label="Flips view">
-            <mat-button-toggle value="table" title="Table view"><mat-icon>view_list</mat-icon></mat-button-toggle>
-            <mat-button-toggle value="cards" title="Card view"><mat-icon>grid_view</mat-icon></mat-button-toggle>
-          </mat-button-toggle-group>
-        }
-        <button mat-flat-button color="primary" type="button" (click)="openAddFlipDialog()">
-          <mat-icon>add</mat-icon> Add Flip
+  <!-- Summary numbers -->
+  <section class="stats">
+    <app-stat-tile label="Total Profit" icon="payments"
+                   [tone]="totalProfit() < 0 ? 'danger' : 'success'"
+                   [value]="(totalProfit() | currency) ?? ''"
+                   [hint]="'From ' + soldCount() + ' sold ' + (soldCount() === 1 ? 'flip' : 'flips')" />
+    <app-stat-tile label="Average ROI" icon="trending_up" tone="brand"
+                   [value]="averageRoi() === null ? '—' : ((averageRoi() | percent:'1.0-1') ?? '')"
+                   hint="On sold flips" />
+    <app-stat-tile label="Unsold Inventory" icon="inventory_2" tone="warning"
+                   [value]="(unsoldCost() | currency) ?? ''"
+                   [hint]="unsoldCount() + ' ' + (unsoldCount() === 1 ? 'item' : 'items') + ' not sold yet'" />
+    <app-stat-tile label="Total Flips" icon="sell" tone="info"
+                   [value]="'' + records().length"
+                   [hint]="statusCount(FlipStatusIds.Listed) + ' listed right now'" />
+  </section>
+
+  @if (records().length === 0) {
+    <div class="fl-panel fl-empty empty-first">
+      <mat-icon>inventory_2</mat-icon>
+      <h2>No flips yet</h2>
+      <p>Add the first item you've bought to start tracking your profit.</p>
+      <button mat-flat-button class="fl-primary-button" type="button" (click)="openAddFlipDialog()">
+        <mat-icon>add</mat-icon> Add Flip
+      </button>
+    </div>
+  } @else {
+    <!-- Filters + search + view toggle -->
+    <div class="fl-toolbar">
+      <div class="fl-chips" role="tablist" aria-label="Filter by status">
+        <button type="button" class="fl-chip" [class.active]="statusFilter() === 'all'" (click)="statusFilter.set('all')">
+          All <span class="fl-chip-count">{{ records().length }}</span>
         </button>
+        @for (status of statusFilters; track status.id) {
+          <button type="button" class="fl-chip" [class.active]="statusFilter() === status.id" (click)="statusFilter.set(status.id)">
+            {{ status.name }} <span class="fl-chip-count">{{ statusCount(status.id) }}</span>
+          </button>
+        }
       </div>
-    </mat-card-header>
-    <mat-card-content>
-        @if (records().length === 0) {
-          <div class="empty-state">
-            <mat-icon>inventory_2</mat-icon>
-            <h2>No flips yet</h2>
-            <p>Click <strong>Add Flip</strong> to start tracking your profits!</p>
-          </div>
-        } @else if (viewMode() === 'cards') {
-          <app-flip-record-cards
-            [records]="records()"
-            (edit)="editRecord($event)"
-            (delete)="deleteRecord($event)"
-            (addAddOns)="openSelectAddOnsForRecord($event)">
-          </app-flip-record-cards>
-        } @else {
+
+      <div class="fl-toolbar-right">
+        <label class="fl-search">
+          <mat-icon>search</mat-icon>
+          <input type="search" placeholder="Search flips" aria-label="Search flips"
+                 [value]="search()" (input)="search.set($any($event.target).value)">
+        </label>
+        <mat-button-toggle-group [value]="viewMode()" (change)="setViewMode($event.value)"
+                                 hideSingleSelectionIndicator aria-label="Flips view" class="view-toggle">
+          <mat-button-toggle value="cards" title="Card view"><mat-icon>grid_view</mat-icon></mat-button-toggle>
+          <mat-button-toggle value="table" title="Table view"><mat-icon>view_list</mat-icon></mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </div>
+
+    @if (filteredRecords().length === 0) {
+      <div class="fl-panel fl-empty">
+        <mat-icon>search_off</mat-icon>
+        <h2>No matching flips</h2>
+        <p>Try a different filter or search.</p>
+        <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+      </div>
+    } @else if (viewMode() === 'cards') {
+      <app-flip-record-cards
+        [records]="filteredRecords()"
+        (edit)="editRecord($event)"
+        (delete)="deleteRecord($event)"
+        (addAddOns)="openSelectAddOnsForRecord($event)">
+      </app-flip-record-cards>
+    } @else {
+      <div class="fl-panel table-panel">
         <!-- multiTemplateDataRows: each flip renders a normal row + a hidden detail row -->
-        <table mat-table [dataSource]="records()" multiTemplateDataRows class="records-table">
+        <table mat-table [dataSource]="filteredRecords()" multiTemplateDataRows class="records-table">
           <!-- Expand Column -->
           <ng-container matColumnDef="expand">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let record">
+            <td mat-cell *matCellDef="let record" class="expand-cell">
               <button mat-icon-button type="button" [attr.aria-label]="isExpanded(record) ? 'Hide add-ons' : 'Show add-ons'"
                       (click)="toggleExpanded(record); $event.stopPropagation()">
                 <mat-icon class="expand-icon" [class.expanded]="isExpanded(record)">chevron_right</mat-icon>
@@ -55,54 +95,48 @@
             </td>
           </ng-container>
 
-          <!-- Image Column -->
-          <ng-container matColumnDef="image">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let record" class="image-cell">
-              @if (record.imageUrl) {
-                <img class="flip-thumb" [src]="record.imageUrl" [alt]="record.itemName" loading="lazy">
-              } @else {
-                <mat-icon class="flip-thumb placeholder">image</mat-icon>
-              }
+          <!-- Item Column (image + name + bought date) -->
+          <ng-container matColumnDef="item">
+            <th mat-header-cell *matHeaderCellDef>Item</th>
+            <td mat-cell *matCellDef="let record">
+              <div class="item-cell">
+                @if (record.imageUrl) {
+                  <img class="flip-thumb" [src]="record.imageUrl" [alt]="record.itemName" loading="lazy">
+                } @else {
+                  <span class="flip-thumb placeholder"><mat-icon>image</mat-icon></span>
+                }
+                <div class="item-text">
+                  <span class="item-name">{{ record.itemName }}</span>
+                  <span class="item-date">Bought {{ record.flipDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
             </td>
-          </ng-container>
-
-          <!-- Date Column -->
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Bought</th>
-            <td mat-cell *matCellDef="let record">{{ record.flipDate | date:'mediumDate' }}</td>
           </ng-container>
 
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let record">
-              <span class="status-chip" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
+              <span class="fl-pill" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
             </td>
-          </ng-container>
-
-          <!-- Item Name Column -->
-          <ng-container matColumnDef="itemName">
-            <th mat-header-cell *matHeaderCellDef>Item</th>
-            <td mat-cell *matCellDef="let record">{{ record.itemName }}</td>
           </ng-container>
 
           <!-- Buy Price Column -->
           <ng-container matColumnDef="buyPrice">
-            <th mat-header-cell *matHeaderCellDef>Buy</th>
-            <td mat-cell *matCellDef="let record">{{ record.buyPrice | currency }}</td>
+            <th mat-header-cell *matHeaderCellDef class="num">Buy</th>
+            <td mat-cell *matCellDef="let record" class="num">{{ record.buyPrice | currency }}</td>
           </ng-container>
 
           <!-- Parts Price Column -->
           <ng-container matColumnDef="partsPrice">
-            <th mat-header-cell *matHeaderCellDef>Parts</th>
-            <td mat-cell *matCellDef="let record">{{ record.partsPrice | currency }}</td>
+            <th mat-header-cell *matHeaderCellDef class="num">Parts</th>
+            <td mat-cell *matCellDef="let record" class="num">{{ record.partsPrice | currency }}</td>
           </ng-container>
 
           <!-- Sell Price Column -->
           <ng-container matColumnDef="sellPrice">
-            <th mat-header-cell *matHeaderCellDef>Sell</th>
-            <td mat-cell *matCellDef="let record">
+            <th mat-header-cell *matHeaderCellDef class="num">Sell</th>
+            <td mat-cell *matCellDef="let record" class="num">
               @if (record.sellPrice != null) {
                 {{ record.sellPrice | currency }}
                 @if (record.flipStatusId !== FlipStatusIds.Sold) {
@@ -116,8 +150,9 @@
 
           <!-- Profit Column -->
           <ng-container matColumnDef="profit">
-            <th mat-header-cell *matHeaderCellDef>Profit</th>
-            <td mat-cell *matCellDef="let record" [class.positive]="record.profit > 0" [class.negative]="record.profit < 0">
+            <th mat-header-cell *matHeaderCellDef class="num">Profit</th>
+            <td mat-cell *matCellDef="let record" class="num profit-cell"
+                [class.fl-money-positive]="record.profit > 0" [class.fl-money-negative]="record.profit < 0">
               @if (record.profit != null) {
                 {{ record.profit | currency }}
               } @else if (record.sellPrice != null) {
@@ -132,13 +167,13 @@
 
           <!-- Actions Column -->
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let record">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let record" class="actions-cell">
               <button mat-icon-button (click)="editRecord(record); $event.stopPropagation()" title="Edit flip">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteRecord(record); $event.stopPropagation()" title="Delete">
-                <mat-icon>delete</mat-icon>
+              <button mat-icon-button (click)="deleteRecord(record); $event.stopPropagation()" title="Delete flip">
+                <mat-icon>delete_outline</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -177,7 +212,7 @@
                               }
                             </td>
                             <td class="add-on-actions">
-                              <button mat-icon-button type="button" color="warn" (click)="deleteAddOn(addOn)" title="Delete add-on">
+                              <button mat-icon-button type="button" (click)="deleteAddOn(addOn)" title="Remove add-on">
                                 <mat-icon>delete_outline</mat-icon>
                               </button>
                             </td>
@@ -215,7 +250,7 @@
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
               class="detail-row" [class.collapsed]="!isExpanded(row)"></tr>
         </table>
-        }
-    </mat-card-content>
-  </mat-card>
+      </div>
+    }
+  }
 </div>
