@@ -112,3 +112,21 @@
     font-size: 0.85rem;
   }
 }
+
+.auction-thumbnail {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  display: block;
+
+  &.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.3);
+    cursor: default;
+  }
+}

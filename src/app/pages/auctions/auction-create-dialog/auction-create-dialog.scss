@@ -41,3 +41,24 @@ div[mat-dialog-actions] {
     gap: 16px;
   }
 }
+
+.image-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  .image-preview {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .image-preview-error {
+    font-size: 0.8rem;
+    color: #c62828;
+    padding-top: 18px;
+    white-space: nowrap;
+  }
+}

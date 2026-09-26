@@ -51,10 +51,21 @@ export class AuctionGrid {
   deleteAuction = output<number>();
   openLink = output<string>();
   editAuction = output<Auction>();
-  displayedColumns = ['name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
+  displayedColumns = ['image', 'name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
 
+
+  // Auctions whose image link failed to load, so we show the placeholder instead
+  brokenImageIds = new Set<number>();
 
   constructor(private dialog: MatDialog) {}
+
+  hasImage(auction: Auction): boolean {
+    return !!auction.imageUrl && !this.brokenImageIds.has(auction.id);
+  }
+
+  onImageError(auction: Auction) {
+    this.brokenImageIds.add(auction.id);
+  }
 
   onDeleteAuction(id: number) {
     this.deleteAuction.emit(id);

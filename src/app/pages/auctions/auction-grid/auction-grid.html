@@ -5,6 +5,22 @@
     </mat-card-header>
     <mat-card-content>
       <table mat-table [dataSource]="auctions()" class="auctions-table">
+        <!-- Image Column -->
+        <ng-container matColumnDef="image">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let auction">
+            @if (hasImage(auction)) {
+              <img class="auction-thumbnail" [src]="auction.imageUrl" [alt]="auction.name"
+                   loading="lazy" (error)="onImageError(auction)"
+                   (click)="onOpenLink(auction.imageUrl)" title="Open full image">
+            } @else {
+              <div class="auction-thumbnail placeholder">
+                <mat-icon>image</mat-icon>
+              </div>
+            }
+          </td>
+        </ng-container>
+
         <!-- Name Column -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Item</th>

@@ -44,6 +44,8 @@ export class AuctionCreateDialog implements OnInit {
   endTime = signal<Date | null>(null);
   endTimeStr = signal('');
   notes = signal('');
+  imageUrl = signal('');
+  imagePreviewFailed = signal(false);
   auctionSiteId = signal<number | null>(null);
   auctionSites = signal<AuctionSite[]>([]);
   saveText = 'Track Auction';
@@ -72,6 +74,7 @@ export class AuctionCreateDialog implements OnInit {
     this.endTime.set(endDate);
     this.endTimeStr.set(endDate.toTimeString().slice(0, 5));
     this.notes.set(auction.notes || '');
+    this.imageUrl.set(auction.imageUrl || '');
     this.auctionSiteId.set(auction.auctionSiteId);
   }
 
@@ -82,6 +85,11 @@ export class AuctionCreateDialog implements OnInit {
       this.auctionLink().trim() !== '' &&
       this.endTime() !== null &&
       this.endTimeStr().trim() !== '';
+  }
+
+  onImageUrlChange(value: string) {
+    this.imageUrl.set(value);
+    this.imagePreviewFailed.set(false); // try loading the preview again for the new link
   }
 
   cancel() {
@@ -100,7 +108,7 @@ export class AuctionCreateDialog implements OnInit {
       name: this.itemName().trim(),
       auctionSiteId: this.auctionSiteId()!,
       link: this.auctionLink().trim(),
-      imageUrl: this.data?.imageUrl ?? null,
+      imageUrl: this.imageUrl().trim() || null,
       currentPrice: this.currentPrice() ?? 0,
       startTime: this.data?.startTime ?? new Date(),
       endTime: endDateTime,
