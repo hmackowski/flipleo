@@ -17,7 +17,9 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+      // Errors from the sign-in / password pages are shown on the form itself
+      const isAuthRequest = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password']
+        .some((path) => req.url.includes(path));
 
       if (error.status === 401 && !isAuthRequest) {
         // Token expired or invalid: end the session and send them to log in again
@@ -26,7 +28,6 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       } else if (!isAuthRequest) {
         snackBar.open(getErrorMessage(error), 'Dismiss', { duration: 6000 });
       }
-      // Login/register errors are shown on the login form itself
 
       return throwError(() => error);
     })

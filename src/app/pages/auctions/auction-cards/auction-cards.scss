@@ -1,0 +1,139 @@
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.auction-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 150ms ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &.ended {
+    opacity: 0.7;
+  }
+}
+
+.auction-image {
+  position: relative;
+  height: 180px;
+  margin: -16px -16px 0;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  background: #f1f3f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    color: #c4c9cc;
+  }
+
+  .site-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.92);
+    color: #333;
+  }
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+
+  .item-name {
+    font-weight: 600;
+    font-size: 1.05rem;
+    // two lines max, then "..."
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-shrink: 0;
+    margin: -8px -8px 0 0;
+  }
+}
+
+.label {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+
+  .price {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .countdown {
+    text-align: right;
+
+    .timer {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    &.urgent .timer {
+      color: #f44336;
+      font-weight: 700;
+    }
+  }
+}
+
+.dates {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.won-button {
+  align-self: flex-start;
+  margin-top: auto; // keeps the button at the bottom when cards are different heights
+}
+
+.notes {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}

@@ -1,0 +1,158 @@
+h2[mat-dialog-title] {
+  padding: 32px 32px 0 32px;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+div[mat-dialog-content] {
+  padding: 24px 32px 8px;
+}
+
+div[mat-dialog-actions] {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  .status-label {
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+.add-ons-section {
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 8px;
+    }
+  }
+}
+
+.add-on-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+
+  th,
+  td {
+    text-align: left;
+    padding: 4px 8px 4px 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  th {
+    font-weight: 600;
+    color: #666;
+  }
+
+  .thumb-cell {
+    width: 44px;
+  }
+
+  .price-cell {
+    white-space: nowrap;
+
+    .dollar {
+      color: #666;
+      margin-right: 2px;
+    }
+  }
+
+  .price-input {
+    width: 90px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+  }
+
+  .actions {
+    text-align: right;
+    width: 48px;
+  }
+}
+
+.thumb {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.new-badge {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  background: rgba(91, 75, 196, 0.12);
+  color: #5b4bc4;
+}
+
+.no-add-ons {
+  margin: 8px 0;
+  color: #888;
+  font-style: italic;
+}
+
+.totals {
+  display: flex;
+  gap: 32px;
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #555;
+
+  .positive {
+    color: #4caf50;
+  }
+
+  .negative {
+    color: #f44336;
+  }
+
+  .muted {
+    color: #999;
+    font-weight: 400;
+    font-style: italic;
+  }
+}

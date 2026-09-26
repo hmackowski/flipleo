@@ -1,0 +1,16 @@
+<!-- e.g. right-click the listing photo > "Copy image address" -->
+<div class="image-row">
+  <mat-form-field appearance="outline" class="link-field">
+    <mat-label>{{ label() }}</mat-label>
+    <input matInput type="url" maxlength="1000" placeholder="https://i.ebayimg.com/..."
+           [value]="value()" (input)="onInput($any($event.target).value)">
+  </mat-form-field>
+
+  @if (value().trim()) {
+    @if (!previewFailed()) {
+      <img class="image-preview" [src]="value().trim()" alt="Image preview" (error)="previewFailed.set(true)">
+    } @else {
+      <span class="image-preview-error">Couldn't load that image</span>
+    }
+  }
+</div>

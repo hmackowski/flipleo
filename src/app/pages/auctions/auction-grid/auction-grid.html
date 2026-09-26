@@ -2,8 +2,22 @@
   <mat-card class="auctions-table-card">
     <mat-card-header>
       <mat-card-title>Tracked Auctions ({{ auctions().length }})</mat-card-title>
+      <mat-button-toggle-group [value]="viewMode()" (change)="setViewMode($event.value)"
+                               hideSingleSelectionIndicator aria-label="Auctions view">
+        <mat-button-toggle value="table" title="Table view"><mat-icon>view_list</mat-icon></mat-button-toggle>
+        <mat-button-toggle value="cards" title="Card view"><mat-icon>grid_view</mat-icon></mat-button-toggle>
+      </mat-button-toggle-group>
     </mat-card-header>
     <mat-card-content>
+      @if (viewMode() === 'cards') {
+        <app-auction-cards
+          [auctions]="auctions()"
+          (edit)="onEditAuction($event)"
+          (delete)="onDeleteAuction($event)"
+          (openLink)="onOpenLink($event)"
+          (createFlip)="createFlip.emit($event)">
+        </app-auction-cards>
+      } @else {
       <table mat-table [dataSource]="auctions()" class="auctions-table">
         <!-- Image Column -->
         <ng-container matColumnDef="image">
@@ -89,6 +103,9 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let auction">
+            <button mat-icon-button (click)="createFlip.emit(auction)" title="Won it? Add a flip from this auction">
+              <mat-icon>add_shopping_cart</mat-icon>
+            </button>
             <button mat-icon-button color="warn" (click)="onEditAuction(auction)" title="Edit">
               <mat-icon>edit</mat-icon>
             </button>
@@ -101,6 +118,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+      }
     </mat-card-content>
   </mat-card>
 } @else {

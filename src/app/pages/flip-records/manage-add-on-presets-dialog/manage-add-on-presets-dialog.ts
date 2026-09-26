@@ -8,6 +8,7 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 
 import { AddOnPresetDataService } from '@app/core/services/data';
+import { ConfirmDialogService } from '@app/core/services/confirm-dialog.service';
 import { AddOnPreset } from '@app/shared/models';
 
 /**
@@ -33,6 +34,7 @@ import { AddOnPreset } from '@app/shared/models';
 export class ManageAddOnPresetsDialog implements OnInit {
   private dialogRef = inject(MatDialogRef<ManageAddOnPresetsDialog, boolean>);
   private addOnPresetDataService = inject(AddOnPresetDataService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   presets = signal<AddOnPreset[]>([]);
   private changed = false;
@@ -120,12 +122,21 @@ export class ManageAddOnPresetsDialog implements OnInit {
   }
 
   deletePreset(preset: AddOnPreset) {
-    if (preset.id == null) return;
+    const presetId = preset.id;
+    if (presetId == null) return;
 
-    this.addOnPresetDataService.deleteAddOnPreset(preset.id).subscribe(() => {
-      this.changed = true;
-      this.loadPresets();
-    });
+    this.confirmDialog
+      .confirm({
+        title: 'Delete add-on?',
+        message: `"${preset.name}" will be removed from My Add-Ons. Flips that already use it keep their copy.`,
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.addOnPresetDataService.deleteAddOnPreset(presetId).subscribe(() => {
+          this.changed = true;
+          this.loadPresets();
+        });
+      });
   }
 
   close() {

@@ -1,57 +1,63 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 import { Observable, forkJoin, map, of } from 'rxjs';
 
 import { AddOnPresetDataService, FlipRecordDataService } from '@app/core/services/data';
-import { AddOnPreset, FlipRecord, FlipRecordAddOn } from '@app/shared/models';
+import { AddOnPreset, FlipRecord, FlipRecordAddOn, FlipStatusIds } from '@app/shared/models';
+import { ConfirmDialogService } from '@app/core/services/confirm-dialog.service';
 import { CreateAddOnDialog, CreateAddOnResult } from './create-add-on-dialog/create-add-on-dialog';
 import { SelectAddOnsDialog } from './select-add-ons-dialog/select-add-ons-dialog';
+import { EditFlipRecordDialog } from './edit-flip-record-dialog/edit-flip-record-dialog';
+import { fromPreset } from './add-on.utils';
+import { FlipRecordCards } from './flip-record-cards/flip-record-cards';
+
+type ViewMode = 'table' | 'cards';
+const VIEW_MODE_KEY = 'flipleo_flips_view';
 
 @Component({
   selector: 'app-flip-records',
   imports: [
-    FormsModule,
     MatButtonModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatTableModule,
     MatIconModule,
     CurrencyPipe,
-    DatePipe
+    DatePipe,
+    MatButtonToggleModule,
+    FlipRecordCards
   ],
   templateUrl: './flip-records.component.html',
   styleUrl: './flip-records.component.scss'
 })
 export class FlipRecords implements OnInit {
-  // Form fields
-  itemName = signal('');
-  buyPrice = signal<number | null>(null);
-  sellPrice = signal<number | null>(null);
-
-  // Add-ons for the flip being created (saved together with it)
-  pendingAddOns = signal<FlipRecordAddOn[]>([]);
-  pendingPartsPrice = computed(() =>
-    this.pendingAddOns().reduce((sum, addOn) => sum + addOn.price, 0)
-  );
-
   // Records
   records = signal<FlipRecord[]>([]);
+  // Profit only counts sold flips (profit is null until then)
   totalProfit = computed(() =>
     this.records().reduce((sum, record) => sum + (record.profit ?? 0), 0)
   );
 
+  // Items bought but not sold yet, and what's tied up in them (buy + parts)
+  private unsoldRecords = computed(() => this.records().filter((r) => r.flipStatusId !== FlipStatusIds.Sold));
+  unsoldCount = computed(() => this.unsoldRecords().length);
+  unsoldCost = computed(() =>
+    this.unsoldRecords().reduce((sum, r) => sum + r.buyPrice + (r.partsPrice ?? 0), 0)
+  );
+
+  readonly FlipStatusIds = FlipStatusIds;
+
   // Table columns
-  displayedColumns = ['expand', 'date', 'itemName', 'buyPrice', 'partsPrice', 'sellPrice', 'profit', 'actions'];
+  displayedColumns = ['expand', 'image', 'date', 'status', 'itemName', 'buyPrice', 'partsPrice', 'sellPrice', 'profit', 'actions'];
+
+  // Table or card view (remembered in this browser, it's just a display preference)
+  viewMode = signal<ViewMode>(loadViewMode());
 
   // Which flip's add-ons are showing (one at a time)
   expandedRecordId = signal<number | null>(null);
@@ -59,7 +65,8 @@ export class FlipRecords implements OnInit {
   constructor(
     private flipRecordDataService: FlipRecordDataService,
     private addOnPresetDataService: AddOnPresetDataService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit() {
@@ -72,22 +79,30 @@ export class FlipRecords implements OnInit {
       .subscribe((records) => this.records.set(records));
   }
 
-  addRecord() {
-    if (!this.isFormValid()) return;
+  /** "Add Flip" button: opens the flip dialog empty, then saves the new flip (with its add-ons). */
+  openAddFlipDialog() {
+    this.dialog
+      .open<EditFlipRecordDialog, void, FlipRecord>(EditFlipRecordDialog, {
+        width: '820px',
+        maxWidth: '95vw',
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((newRecord) => {
+        if (!newRecord) return;
+        this.flipRecordDataService
+          .addFlipRecord(newRecord)
+          .subscribe(() => this.loadRecords());
+      });
+  }
 
-    const newRecord: FlipRecord = {
-      itemName: this.itemName().trim(),
-      buyPrice: this.buyPrice() ?? 0,
-      sellPrice: this.sellPrice() ?? 0,
-      flipDate: toDateString(new Date()),
-      auctionId: null,
-      addOns: this.pendingAddOns(),
-    };
-
-    this.flipRecordDataService.addFlipRecord(newRecord).subscribe(() => {
-      this.resetForm();
-      this.loadRecords();
-    });
+  setViewMode(mode: ViewMode) {
+    this.viewMode.set(mode);
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch {
+      // storage unavailable (private mode etc.): the choice just won't be remembered
+    }
   }
 
   toggleExpanded(record: FlipRecord) {
@@ -98,42 +113,57 @@ export class FlipRecords implements OnInit {
     return this.expandedRecordId() === record.id;
   }
 
-  deleteAddOn(addOnId: number) {
-    this.flipRecordDataService
-      .deleteAddOn(addOnId)
-      .subscribe(() => this.loadRecords());
+  deleteAddOn(addOn: FlipRecordAddOn) {
+    const addOnId = addOn.id;
+    if (addOnId == null) return;
+
+    this.confirmDialog
+      .confirm({ title: 'Remove add-on?', message: `Remove "${addOn.name}" from this flip?`, confirmText: 'Remove' })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.flipRecordDataService
+          .deleteAddOn(addOnId)
+          .subscribe(() => this.loadRecords());
+      });
   }
 
   openLink(link: string) {
     window.open(link, '_blank');
   }
 
-  deleteRecord(id: number) {
-    this.flipRecordDataService
-      .deleteFlipRecord(id)
-      .subscribe(() => this.loadRecords());
+  /** Edit button on a row or card: change the flip and its add-ons. */
+  editRecord(record: FlipRecord) {
+    this.dialog
+      .open<EditFlipRecordDialog, FlipRecord, FlipRecord>(EditFlipRecordDialog, {
+        width: '820px',
+        maxWidth: '95vw',
+        autoFocus: false,
+        data: record,
+      })
+      .afterClosed()
+      .subscribe((updated) => {
+        if (!updated) return;
+        this.flipRecordDataService
+          .updateFlipRecord(updated)
+          .subscribe(() => this.loadRecords());
+      });
   }
 
-  isFormValid(): boolean {
-    return this.itemName().trim() !== '' &&
-           this.buyPrice() !== null &&
-           this.sellPrice() !== null;
-  }
+  deleteRecord(record: FlipRecord) {
+    const recordId = record.id;
+    if (recordId == null) return;
 
-  /** Add-On button on the "Add New Flip" form: queue it until the flip is saved. */
-  openCreateAddOnDialog() {
-    this.openAddOnDialog().subscribe((addOn) => {
-      if (!addOn) return;
-      this.pendingAddOns.update((addOns) => [...addOns, addOn]);
-    });
-  }
-
-  /** "Add-Ons" on the new flip: pick saved add-ons, then they're queued until the flip is saved. */
-  openSelectAddOnsForNewFlip() {
-    this.openSelectAddOnsDialog().subscribe((presets) => {
-      if (!presets?.length) return;
-      this.pendingAddOns.update((addOns) => [...addOns, ...presets.map(fromPreset)]);
-    });
+    this.confirmDialog
+      .confirm({
+        title: 'Delete flip?',
+        message: `"${record.itemName}" and its add-ons will be deleted. This can't be undone.`,
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.flipRecordDataService
+          .deleteFlipRecord(recordId)
+          .subscribe(() => this.loadRecords());
+      });
   }
 
   /** "Add-Ons" inside an expanded flip: pick saved add-ons and save them to that flip right away. */
@@ -152,10 +182,6 @@ export class FlipRecords implements OnInit {
     return this.dialog
       .open<SelectAddOnsDialog, void, AddOnPreset[]>(SelectAddOnsDialog, { width: '640px', maxWidth: '95vw', autoFocus: false })
       .afterClosed();
-  }
-
-  removePendingAddOn(index: number) {
-    this.pendingAddOns.update((addOns) => addOns.filter((_, i) => i !== index));
   }
 
   /** Add-On button on an existing row: save it straight to the API. */
@@ -202,29 +228,12 @@ export class FlipRecords implements OnInit {
         map((preset) => ({ ...addOn, addOnPresetId: preset.id ?? null }))
       );
   }
+}
 
-  private resetForm() {
-    this.itemName.set('');
-    this.buyPrice.set(null);
-    this.sellPrice.set(null);
-    this.pendingAddOns.set([]);
+function loadViewMode(): ViewMode {
+  try {
+    return localStorage.getItem(VIEW_MODE_KEY) === 'cards' ? 'cards' : 'table';
+  } catch {
+    return 'table';
   }
-}
-
-/** A preset becomes a flip add-on by copying its values (so later preset edits don't change past flips). */
-function fromPreset(preset: AddOnPreset): FlipRecordAddOn {
-  return {
-    addOnPresetId: preset.id ?? null,
-    name: preset.name,
-    price: preset.defaultPrice,
-    link: preset.link ?? null,
-    imageUrl: preset.imageUrl ?? null,
-  };
-}
-
-/** yyyy-MM-dd in local time, so the API stores the date you actually see. */
-function toDateString(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
 }

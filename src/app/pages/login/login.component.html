@@ -64,6 +64,10 @@
           }
         </mat-form-field>
 
+        @if (!isRegisterMode()) {
+          <a class="forgot-link" routerLink="/forgot-password">Forgot password?</a>
+        }
+
         @if (isRegisterMode()) {
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Confirm password</mat-label>

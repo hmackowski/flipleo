@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
@@ -16,8 +16,14 @@ import {
 } from '@angular/material/table';
 import { MatIcon } from '@angular/material/icon';
 import { Auction } from '@app/shared/models';
-import {MatDialog} from '@angular/material/dialog';
-import {AuctionCreateDialog} from '../auction-create-dialog/auction-create-dialog';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
+import { AuctionCreateDialog } from '../auction-create-dialog/auction-create-dialog';
+import { AuctionCards } from '../auction-cards/auction-cards';
+import { getCountdown, isAuctionEnded, isEndingWithin3Hours } from '../auction-time.utils';
+
+type ViewMode = 'table' | 'cards';
+const VIEW_MODE_KEY = 'flipleo_auctions_view';
 
 @Component({
   selector: 'app-auction-grid',
@@ -40,7 +46,10 @@ import {AuctionCreateDialog} from '../auction-create-dialog/auction-create-dialo
     MatIconButton,
     MatRow,
     MatRowDef,
-    MatTable
+    MatTable,
+    MatButtonToggle,
+    MatButtonToggleGroup,
+    AuctionCards
   ],
   templateUrl: './auction-grid.html',
   styleUrl: './auction-grid.scss',
@@ -51,13 +60,26 @@ export class AuctionGrid {
   deleteAuction = output<number>();
   openLink = output<string>();
   editAuction = output<Auction>();
+  createFlip = output<Auction>();
   displayedColumns = ['image', 'name', 'currentPrice', 'startTime', 'countdown','auction_site', 'link', 'notes', 'actions'];
 
+
+  // Table or card view (remembered in this browser, it's just a display preference)
+  viewMode = signal<ViewMode>(loadViewMode());
 
   // Auctions whose image link failed to load, so we show the placeholder instead
   brokenImageIds = new Set<number>();
 
   constructor(private dialog: MatDialog) {}
+
+  setViewMode(mode: ViewMode) {
+    this.viewMode.set(mode);
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch {
+      // storage unavailable (private mode etc.): the choice just won't be remembered
+    }
+  }
 
   hasImage(auction: Auction): boolean {
     return !!auction.imageUrl && !this.brokenImageIds.has(auction.id);
@@ -89,41 +111,16 @@ export class AuctionGrid {
     this.openLink.emit(link);
   }
 
-  getCountdown(endTime: Date): string {
-    const now = new Date().getTime();
-    const end = new Date(endTime).getTime();
-    const diff = end - now;
+  // Countdown helpers (shared with the card view)
+  getCountdown = getCountdown;
+  isEndingWithin3Hours = isEndingWithin3Hours;
+  isAuctionEnded = isAuctionEnded;
+}
 
-    if (diff <= 0) return 'ENDED';
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
-    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
-    return `${minutes}m ${seconds}s`;
-  }
-
-  isEndingSameDay(endTime: Date): boolean {
-    const now = new Date();
-    const end = new Date(endTime);
-
-    return now.getFullYear() === end.getFullYear() &&
-      now.getMonth() === end.getMonth() &&
-      now.getDate() === end.getDate() &&
-      end > now;
-  }
-
-  isEndingWithin3Hours(endTime: Date): boolean {
-    const now = new Date().getTime();
-    const end = new Date(endTime).getTime();
-    const diff = end - now;
-    return diff > 0 && diff <= 3 * 60 * 60 * 1000;
-  }
-
-  isAuctionEnded(endTime: Date): boolean {
-    return new Date(endTime) < new Date();
+function loadViewMode(): ViewMode {
+  try {
+    return localStorage.getItem(VIEW_MODE_KEY) === 'cards' ? 'cards' : 'table';
+  } catch {
+    return 'table';
   }
 }

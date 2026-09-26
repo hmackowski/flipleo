@@ -1,110 +1,47 @@
 <div class="records-container">
   <h1>My Flip Records</h1>
 
-  <!-- Add Record Form -->
-  <mat-card class="add-record-card">
+  <mat-card class="records-table-card">
     <mat-card-header>
-      <mat-card-title>Add New Flip</mat-card-title>
+      <mat-card-title>All Flips</mat-card-title>
       <div class="header-actions">
-        <button mat-button type="button" (click)="openCreateAddOnDialog()" title="Add a one-off add-on that isn't saved in your list">
-          <mat-icon>edit_note</mat-icon> One-Off Add-On
-        </button>
-        <button mat-raised-button class="add-addon-button" type="button" (click)="openSelectAddOnsForNewFlip()">
-          <mat-icon>playlist_add</mat-icon> Add-Ons
+        @if (records().length > 0) {
+          <div class="totals">
+            <div class="total-profit">
+              Total Profit: <span class="profit-amount">{{ totalProfit() | currency }}</span>
+            </div>
+            @if (unsoldCount() > 0) {
+              <div class="unsold-summary">
+                {{ unsoldCount() }} unsold · {{ unsoldCost() | currency }} invested
+              </div>
+            }
+          </div>
+          <mat-button-toggle-group [value]="viewMode()" (change)="setViewMode($event.value)"
+                                   hideSingleSelectionIndicator aria-label="Flips view">
+            <mat-button-toggle value="table" title="Table view"><mat-icon>view_list</mat-icon></mat-button-toggle>
+            <mat-button-toggle value="cards" title="Card view"><mat-icon>grid_view</mat-icon></mat-button-toggle>
+          </mat-button-toggle-group>
+        }
+        <button mat-flat-button color="primary" type="button" (click)="openAddFlipDialog()">
+          <mat-icon>add</mat-icon> Add Flip
         </button>
       </div>
     </mat-card-header>
     <mat-card-content>
-      <form (ngSubmit)="addRecord()" class="record-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Item Name</mat-label>
-          <input
-            matInput
-            type="text"
-            [(ngModel)]="itemName"
-            name="itemName"
-            placeholder="e.g., PS5 Controller"
-            required
-          >
-        </mat-form-field>
-
-        <div class="price-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Buy Price</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="buyPrice"
-              name="buyPrice"
-              placeholder="15"
-              required
-            >
-            <span matTextPrefix>$&nbsp;</span>
-          </mat-form-field>
-
-          <!-- Parts total comes from the add-ons (use the Add-On button) -->
-          <mat-form-field appearance="outline">
-            <mat-label>Parts/Repairs (from add-ons)</mat-label>
-            <input
-              matInput
-              type="number"
-              [value]="pendingPartsPrice()"
-              readonly
-            >
-            <span matTextPrefix>$&nbsp;</span>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Sell Price</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="sellPrice"
-              name="sellPrice"
-              placeholder="75"
-              required
-            >
-            <span matTextPrefix>$&nbsp;</span>
-          </mat-form-field>
-        </div>
-
-        @if (pendingAddOns().length > 0) {
-          <div class="pending-add-ons">
-            @for (addOn of pendingAddOns(); track $index) {
-              <span class="pending-add-on">
-                {{ addOn.name }} ({{ addOn.price | currency }})
-                <button mat-icon-button type="button" (click)="removePendingAddOn($index)" title="Remove add-on">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </span>
-            }
+        @if (records().length === 0) {
+          <div class="empty-state">
+            <mat-icon>inventory_2</mat-icon>
+            <h2>No flips yet</h2>
+            <p>Click <strong>Add Flip</strong> to start tracking your profits!</p>
           </div>
-        }
-
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="!isFormValid()"
-          class="add-button"
-        >
-          <mat-icon>add</mat-icon>
-          Add Record
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Records Table -->
-  @if (records().length > 0) {
-    <mat-card class="records-table-card">
-      <mat-card-header>
-        <mat-card-title>All Flips</mat-card-title>
-        <div class="total-profit">
-          Total Profit: <span class="profit-amount">{{ totalProfit() | currency }}</span>
-        </div>
-      </mat-card-header>
-      <mat-card-content>
+        } @else if (viewMode() === 'cards') {
+          <app-flip-record-cards
+            [records]="records()"
+            (edit)="editRecord($event)"
+            (delete)="deleteRecord($event)"
+            (addAddOns)="openSelectAddOnsForRecord($event)">
+          </app-flip-record-cards>
+        } @else {
         <!-- multiTemplateDataRows: each flip renders a normal row + a hidden detail row -->
         <table mat-table [dataSource]="records()" multiTemplateDataRows class="records-table">
           <!-- Expand Column -->
@@ -118,10 +55,30 @@
             </td>
           </ng-container>
 
+          <!-- Image Column -->
+          <ng-container matColumnDef="image">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let record" class="image-cell">
+              @if (record.imageUrl) {
+                <img class="flip-thumb" [src]="record.imageUrl" [alt]="record.itemName" loading="lazy">
+              } @else {
+                <mat-icon class="flip-thumb placeholder">image</mat-icon>
+              }
+            </td>
+          </ng-container>
+
           <!-- Date Column -->
           <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <th mat-header-cell *matHeaderCellDef>Bought</th>
             <td mat-cell *matCellDef="let record">{{ record.flipDate | date:'mediumDate' }}</td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let record">
+              <span class="status-chip" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
+            </td>
           </ng-container>
 
           <!-- Item Name Column -->
@@ -145,14 +102,31 @@
           <!-- Sell Price Column -->
           <ng-container matColumnDef="sellPrice">
             <th mat-header-cell *matHeaderCellDef>Sell</th>
-            <td mat-cell *matCellDef="let record">{{ record.sellPrice | currency }}</td>
+            <td mat-cell *matCellDef="let record">
+              @if (record.sellPrice != null) {
+                {{ record.sellPrice | currency }}
+                @if (record.flipStatusId !== FlipStatusIds.Sold) {
+                  <span class="asking">asking</span>
+                }
+              } @else {
+                <span class="empty-value">—</span>
+              }
+            </td>
           </ng-container>
 
           <!-- Profit Column -->
           <ng-container matColumnDef="profit">
             <th mat-header-cell *matHeaderCellDef>Profit</th>
             <td mat-cell *matCellDef="let record" [class.positive]="record.profit > 0" [class.negative]="record.profit < 0">
-              {{ record.profit | currency }}
+              @if (record.profit != null) {
+                {{ record.profit | currency }}
+              } @else if (record.sellPrice != null) {
+                <span class="expected" title="Not counted in Total Profit until it's marked Sold">
+                  {{ record.sellPrice - record.buyPrice - (record.partsPrice ?? 0) | currency }} expected
+                </span>
+              } @else {
+                <span class="empty-value">—</span>
+              }
             </td>
           </ng-container>
 
@@ -160,10 +134,10 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let record">
-              <button mat-icon-button (click)="addAddOnToRecord(record); $event.stopPropagation()" title="Add add-on">
-                <mat-icon>add_circle_outline</mat-icon>
+              <button mat-icon-button (click)="editRecord(record); $event.stopPropagation()" title="Edit flip">
+                <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteRecord(record.id); $event.stopPropagation()" title="Delete">
+              <button mat-icon-button color="warn" (click)="deleteRecord(record); $event.stopPropagation()" title="Delete">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
@@ -203,7 +177,7 @@
                               }
                             </td>
                             <td class="add-on-actions">
-                              <button mat-icon-button type="button" color="warn" (click)="deleteAddOn(addOn.id)" title="Delete add-on">
+                              <button mat-icon-button type="button" color="warn" (click)="deleteAddOn(addOn)" title="Delete add-on">
                                 <mat-icon>delete_outline</mat-icon>
                               </button>
                             </td>
@@ -241,13 +215,7 @@
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
               class="detail-row" [class.collapsed]="!isExpanded(row)"></tr>
         </table>
-      </mat-card-content>
-    </mat-card>
-  } @else {
-    <mat-card class="empty-state">
-      <mat-icon>inventory_2</mat-icon>
-      <h2>No flips yet</h2>
-      <p>Add your first flip above to start tracking your profits!</p>
-    </mat-card>
-  }
+        }
+    </mat-card-content>
+  </mat-card>
 </div>

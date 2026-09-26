@@ -1,0 +1,135 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit Flip' : 'Add New Flip' }}</h2>
+
+<div mat-dialog-content>
+  <form (ngSubmit)="save()" class="edit-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Item Name</mat-label>
+      <input matInput type="text" maxlength="200"
+             [ngModel]="itemName()" (ngModelChange)="itemName.set($event)" name="itemName" required>
+    </mat-form-field>
+
+    <app-image-link-field [(value)]="imageUrl" />
+
+    <!-- Status: Bought -> Listed -> Sold. Sell price and sold date are only required once Sold. -->
+    <div class="status-row">
+      <span class="status-label">Status</span>
+      <mat-button-toggle-group [value]="flipStatusId()" (change)="setStatus($event.value)"
+                               hideSingleSelectionIndicator aria-label="Flip status">
+        @for (status of statuses(); track status.id) {
+          <mat-button-toggle [value]="status.id">{{ status.name }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Buy Price</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" min="0" step="0.01"
+               [ngModel]="buyPrice()" (ngModelChange)="buyPrice.set($event)" name="buyPrice" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ sellPriceLabel() }}</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" min="0" step="0.01"
+               [ngModel]="sellPrice()" (ngModelChange)="sellPrice.set($event)" name="sellPrice"
+               [required]="isSold()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Bought Date</mat-label>
+        <input matInput [matDatepicker]="picker"
+               [ngModel]="flipDate()" (ngModelChange)="flipDate.set($event)" name="flipDate" required>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      @if (isSold()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Sold Date</mat-label>
+          <input matInput [matDatepicker]="soldPicker" [min]="flipDate()"
+                 [ngModel]="soldDate()" (ngModelChange)="soldDate.set($event)" name="soldDate" required>
+          <mat-datepicker-toggle matIconSuffix [for]="soldPicker"></mat-datepicker-toggle>
+          <mat-datepicker #soldPicker></mat-datepicker>
+        </mat-form-field>
+      }
+    </div>
+  </form>
+
+  <!-- Add-ons for this flip (nothing is saved until the Save button) -->
+  <div class="add-ons-section">
+    <div class="section-header">
+      <h3>Add-Ons</h3>
+      <div class="section-actions">
+        <button mat-stroked-button type="button" (click)="openSelectAddOns()">
+          <mat-icon>playlist_add</mat-icon> Add-Ons
+        </button>
+        <button mat-button type="button" (click)="openOneOffAddOn()">
+          <mat-icon>edit_note</mat-icon> One-Off Add-On
+        </button>
+      </div>
+    </div>
+
+    @if (addOns().length > 0) {
+      <table class="add-on-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Add-On</th>
+            <th>Price</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (addOn of addOns(); track $index) {
+            <tr>
+              <td class="thumb-cell">
+                @if (addOn.imageUrl) {
+                  <img class="thumb" [src]="addOn.imageUrl" [alt]="addOn.name" loading="lazy">
+                }
+              </td>
+              <td>
+                {{ addOn.name }}
+                @if (!addOn.id) {
+                  <span class="new-badge">new</span>
+                }
+              </td>
+              <td class="price-cell">
+                <span class="dollar">$</span>
+                <input class="price-input" type="number" min="0" step="0.01"
+                       [ngModel]="addOn.price" (ngModelChange)="updateAddOnPrice($index, $event)"
+                       [attr.aria-label]="'Price for ' + addOn.name">
+              </td>
+              <td class="actions">
+                <button mat-icon-button type="button" color="warn" (click)="removeAddOn($index)" title="Remove add-on">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="no-add-ons">No add-ons on this flip.</p>
+    }
+  </div>
+
+  <div class="totals">
+    <span>Parts: <strong>{{ partsPrice() | currency }}</strong></span>
+    @if (profit(); as p) {
+      <span>{{ isSold() ? 'Profit' : 'Expected Profit' }}:
+        <strong [class.positive]="p.value > 0" [class.negative]="p.value < 0">{{ p.value | currency }}</strong>
+      </span>
+    } @else {
+      <span>Profit: <strong class="muted">not sold yet</strong></span>
+    }
+  </div>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="!isFormValid()">
+    {{ isEdit ? 'Save Changes' : 'Add Flip' }}
+  </button>
+</div>

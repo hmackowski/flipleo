@@ -1,0 +1,76 @@
+<div class="card-grid">
+  @for (record of records(); track record.id) {
+    <div class="flip-card">
+      <!-- Main image (placeholder when there's no link or it won't load) -->
+      <div class="flip-image">
+        @if (record.imageUrl && !brokenImages().has(record.id!)) {
+          <img [src]="record.imageUrl" [alt]="record.itemName" loading="lazy" (error)="markBroken(record.id!)">
+        } @else {
+          <mat-icon class="placeholder">image</mat-icon>
+        }
+        <span class="status-badge" [attr.data-status]="record.flipStatusId">{{ record.flipStatusName }}</span>
+      </div>
+      <div class="card-top">
+        <div>
+          <div class="item-name">{{ record.itemName }}</div>
+          <div class="flip-date">{{ record.flipDate | date:'mediumDate' }}</div>
+        </div>
+        <div class="card-actions">
+          <button mat-icon-button type="button" (click)="edit.emit(record)" title="Edit flip">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button type="button" color="warn" (click)="delete.emit(record)" title="Delete flip">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="numbers">
+        <div><span class="label">Buy</span><span>{{ record.buyPrice | currency }}</span></div>
+        <div><span class="label">Parts</span><span>{{ record.partsPrice | currency }}</span></div>
+        <div>
+          <span class="label">{{ record.flipStatusId === FlipStatusIds.Sold ? 'Sell' : 'Asking' }}</span>
+          <span>{{ record.sellPrice != null ? (record.sellPrice | currency) : '—' }}</span>
+        </div>
+      </div>
+
+      <div class="profit-row">
+        @if (record.profit != null) {
+          <span class="profit" [class.positive]="record.profit > 0" [class.negative]="record.profit < 0">
+            {{ record.profit | currency }}
+          </span>
+          @if (roi(record) !== null) {
+            <span class="roi" [class.negative]="roi(record)! < 0">{{ roi(record) | percent:'1.0-1' }} ROI</span>
+          }
+        } @else if (expectedProfit(record) !== null) {
+          <span class="expected" title="Not counted in Total Profit until it's marked Sold">
+            {{ expectedProfit(record) | currency }}
+            <span class="expected-label">expected</span>
+          </span>
+        } @else {
+          <span class="not-sold">Not sold yet · {{ (record.buyPrice + (record.partsPrice ?? 0)) | currency }} in</span>
+        }
+      </div>
+
+      <div class="add-ons">
+        @if (record.addOns.length > 0) {
+          <div class="add-on-list">
+            @for (addOn of record.addOns; track addOn.id) {
+              <span class="add-on-chip" [title]="addOn.name + ' ' + (addOn.price | currency)">
+                @if (addOn.imageUrl) {
+                  <img [src]="addOn.imageUrl" alt="" loading="lazy">
+                }
+                {{ addOn.name }}
+              </span>
+            }
+          </div>
+        } @else {
+          <span class="no-add-ons">No add-ons</span>
+        }
+        <button mat-button type="button" class="add-button" (click)="addAddOns.emit(record)">
+          <mat-icon>playlist_add</mat-icon> Add-Ons
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from '@app/shared/app-constants';
-import { AuthResponse, LoginRequest, RegisterRequest, UserProfile } from '@app/shared/models';
+import { AuthResponse, LoginRequest, RegisterRequest, SuccessResult, UserProfile } from '@app/shared/models';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -25,5 +25,14 @@ export class AuthDataService {
 
   getCurrentUser(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.baseUrl}/me`);
+  }
+
+  /** Always succeeds (the API never says whether the email has an account). */
+  forgotPassword(email: string): Observable<SuccessResult> {
+    return this.http.post<SuccessResult>(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<SuccessResult> {
+    return this.http.post<SuccessResult>(`${this.baseUrl}/reset-password`, { token, newPassword });
   }
 }
