@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, signal} from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import {GreetingDataService} from '@app/core/services/data';
 
 @Component({
   selector: 'app-home',
@@ -11,7 +12,14 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './home.component.scss'
 })
 export class Home {
-  constructor(private router: Router) {}
+  apiMessage = signal('');
+  constructor(private router: Router,
+              private greetingDataService: GreetingDataService) {
+    this.greetingDataService.getGreeting().subscribe({
+      next: (result) => this.apiMessage.set(result.message),
+      error: () => this.apiMessage.set('API not reachable'),
+    });
+  }
 
   exampleDeals = [
     {

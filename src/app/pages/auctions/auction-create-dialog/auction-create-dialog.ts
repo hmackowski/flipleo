@@ -1,17 +1,15 @@
-import {Component, Inject, inject, OnInit, signal} from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
-import { Auction } from '../../../models/auction.model';
-import {NgForOf} from '@angular/common';
-import {MatOption, MatSelect} from '@angular/material/select';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSuffix } from '@angular/material/form-field';
-import {StorageService} from 'app/services/storage.service';
 
-
+import { LookupDataService } from '@app/core/services/data';
+import { Auction, AuctionSite } from '@app/shared/models';
 
 @Component({
   selector: 'app-auction-create-dialog',
@@ -25,7 +23,6 @@ import {StorageService} from 'app/services/storage.service';
     MatPrefix,
     MatSelect,
     MatOption,
-    NgForOf,
     MatDatepickerModule,
     MatNativeDateModule,
     MatSuffix
@@ -36,7 +33,10 @@ import {StorageService} from 'app/services/storage.service';
 })
 export class AuctionCreateDialog implements OnInit {
   private dialogRef = inject(MatDialogRef<AuctionCreateDialog>);
+  private lookupDataService = inject(LookupDataService);
 
+  // Present when editing an existing auction, null when creating
+  data = inject<Auction | null>(MAT_DIALOG_DATA, { optional: true });
 
   itemName = signal('');
   currentPrice = signal<number | null>(null);
@@ -44,38 +44,41 @@ export class AuctionCreateDialog implements OnInit {
   endTime = signal<Date | null>(null);
   endTimeStr = signal('');
   notes = signal('');
-  auctionSite = signal('');
-  auctionSites = ['eBay', 'Goodwill']
-  saveText = 'Track Auction'
-  isEdit: boolean = false;
-
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Auction,
-              private storageService: StorageService) {}
+  auctionSiteId = signal<number | null>(null);
+  auctionSites = signal<AuctionSite[]>([]);
+  saveText = 'Track Auction';
+  titleText = 'Track New Auction';
+  isEdit = false;
 
   ngOnInit() {
-    if(this.data){
+    // Sites come from the LookupAuctionSite table instead of a hard-coded list
+    this.lookupDataService
+      .getAuctionSites()
+      .subscribe((sites) => this.auctionSites.set(sites));
+
+    if (this.data) {
       this.isEdit = true;
-      this.setFormData();
+      this.setFormData(this.data);
     }
   }
 
-  setFormData() {
-    {
-      this.saveText = 'Update Auction'
-      this.itemName.set(this.data.name);
-      this.currentPrice.set(this.data.currentPrice);
-      this.auctionLink.set(this.data.link);
-      const endDate = new Date(this.data.endTime);
-      this.endTime.set(endDate);
-      this.endTimeStr.set(endDate.toTimeString().slice(0, 5));
-      this.notes.set(this.data.notes || '');
-      this.auctionSite.set(this.data.auctionSite);
-    }
+  setFormData(auction: Auction) {
+    this.saveText = 'Update Auction';
+    this.titleText = 'Edit Auction';
+    this.itemName.set(auction.name);
+    this.currentPrice.set(auction.currentPrice);
+    this.auctionLink.set(auction.link);
+    const endDate = new Date(auction.endTime);
+    this.endTime.set(endDate);
+    this.endTimeStr.set(endDate.toTimeString().slice(0, 5));
+    this.notes.set(auction.notes || '');
+    this.auctionSiteId.set(auction.auctionSiteId);
   }
 
   isFormValid(): boolean {
     return this.itemName().trim() !== '' &&
       this.currentPrice() !== null &&
+      this.auctionSiteId() !== null &&
       this.auctionLink().trim() !== '' &&
       this.endTime() !== null &&
       this.endTimeStr().trim() !== '';
@@ -93,22 +96,18 @@ export class AuctionCreateDialog implements OnInit {
     endDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     const result: Auction = {
-      id: this.data?.id || 0,
-      name: this.itemName(),
-      startTime: this.data?.startTime || new Date(),
-      currentPrice: this.currentPrice() || 0,
-      link: this.auctionLink(),
-      auctionSite: this.auctionSite(),
+      id: this.data?.id ?? 0,
+      name: this.itemName().trim(),
+      auctionSiteId: this.auctionSiteId()!,
+      link: this.auctionLink().trim(),
+      imageUrl: this.data?.imageUrl ?? null,
+      currentPrice: this.currentPrice() ?? 0,
+      startTime: this.data?.startTime ?? new Date(),
       endTime: endDateTime,
-      notes: this.notes().trim() ? this.notes() : undefined,
+      notes: this.notes().trim() ? this.notes().trim() : null,
     };
 
-    if(this.isEdit)
-    {
-      this.storageService.editAuction(result);
-      this.dialogRef.close();
-    }
-
+    // The parent component saves it through the API
     this.dialogRef.close(result);
   }
 }

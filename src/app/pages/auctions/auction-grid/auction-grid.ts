@@ -15,7 +15,7 @@ import {
   MatTable
 } from '@angular/material/table';
 import { MatIcon } from '@angular/material/icon';
-import { Auction } from '../../../models/auction.model';
+import { Auction } from '@app/shared/models';
 import {MatDialog} from '@angular/material/dialog';
 import {AuctionCreateDialog} from '../auction-create-dialog/auction-create-dialog';
 

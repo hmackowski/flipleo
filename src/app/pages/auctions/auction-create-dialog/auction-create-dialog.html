@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Track New Auction</h2>
+<h2 mat-dialog-title>{{ titleText }}</h2>
 
 <div mat-dialog-content>
   <form (ngSubmit)="save()" class="auction-form">
@@ -20,8 +20,11 @@
 
       <mat-form-field appearance="outline" class="flex-2">
         <mat-label>Auction Site</mat-label>
-        <mat-select [(ngModel)]="auctionSite" name="auctionSite" required>
-          <mat-option *ngFor="let site of auctionSites" [value]="site">{{site}}</mat-option>
+        <mat-select [ngModel]="auctionSiteId()" (ngModelChange)="auctionSiteId.set($event)"
+                    name="auctionSiteId" required>
+          @for (site of auctionSites(); track site.id) {
+            <mat-option [value]="site.id">{{ site.name }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
 

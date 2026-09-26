@@ -2,29 +2,28 @@
 
 <div mat-dialog-content>
   <form (ngSubmit)="save()" class="auction-form">
-    <!-- form fields go here -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Add-On Name</mat-label>
       <input matInput type="text"
              [ngModel]="addOnName()" (ngModelChange)="addOnName.set($event)"
-             name="itemName" required>
+             name="addOnName" placeholder="e.g., Replacement controller" required>
     </mat-form-field>
 
     <div class="form-row">
-    <mat-form-field appearance="outline">
-      <mat-label>Add-On Price</mat-label>
-      <input matInput type="number"
-             [ngModel]="addOnPrice()" (ngModelChange)="addOnPrice.set($event)"
-             name="itemName" required>
-    </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Add-On Price</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" min="0"
+               [ngModel]="addOnPrice()" (ngModelChange)="addOnPrice.set($event)"
+               name="addOnPrice" required>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="flex-2">
-      <mat-label>Auction Link</mat-label>
-      <input matInput type="url"
-             [ngModel]="addOnLink()" (ngModelChange)="addOnLink.set($event)"
-             name="auctionLink" required>
-    </mat-form-field>
-
+      <mat-form-field appearance="outline" class="flex-2">
+        <mat-label>Link (optional)</mat-label>
+        <input matInput type="url"
+               [ngModel]="addOnLink()" (ngModelChange)="addOnLink.set($event)"
+               name="addOnLink">
+      </mat-form-field>
     </div>
   </form>
 </div>

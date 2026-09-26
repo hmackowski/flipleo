@@ -25,6 +25,22 @@ h1 {
     gap: 16px;
   }
 
+  .pending-add-ons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .pending-add-on {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 12px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+
   .add-button {
     align-self: flex-start;
     display: flex;
