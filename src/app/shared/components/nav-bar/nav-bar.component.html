@@ -1,6 +1,7 @@
 <nav class="navbar">
   <div class="nav-left">
-    <a routerLink="/" class="brand-link">
+    <!-- Signed in: the logo takes you to your flips; signed out: the landing page -->
+    <a [routerLink]="authService.isLoggedIn() ? '/flips' : '/'" class="brand-link">
       <img src="assets/flipleo.png" class="logo" alt="Flipleo logo">
       <span class="brand">Flipleo</span>
     </a>
@@ -15,6 +16,13 @@
     <a routerLink="/auctions" routerLinkActive="active" class="nav-link">
       Auctions
     </a>
+
+    @if(isFeatureActive){
+      <a routerLink="/collection" routerLinkActive="active" class="nav-link">
+        Collection
+      </a>
+    }
+
   </div>
 
 

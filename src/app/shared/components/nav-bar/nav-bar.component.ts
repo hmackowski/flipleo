@@ -16,6 +16,8 @@ import { AuthService } from '@app/core/services/auth.service';
   styleUrl: './nav-bar.component.scss',
 })
 export class NavBar {
+  isFeatureActive: boolean = false;
+
   constructor(
     public authService: AuthService,
     private router: Router
