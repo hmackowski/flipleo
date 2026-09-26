@@ -20,12 +20,21 @@
 
 .flip-image {
   position: relative;
+  flex-shrink: 0;
   height: 180px;
+  overflow: hidden;
   display: grid;
   place-items: center;
   background: var(--fl-surface-muted);
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  img {
+    // Pinned to the box so tall/wide photos are cropped instead of pushing the card open
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   .placeholder { width: 48px; height: 48px; font-size: 48px; color: var(--fl-text-faint); }
 
