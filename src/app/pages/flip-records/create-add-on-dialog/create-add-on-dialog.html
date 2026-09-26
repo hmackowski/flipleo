@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Create Add-On</h2>
+<h2 mat-dialog-title>One-Off Add-On</h2>
 
 <div mat-dialog-content>
   <form (ngSubmit)="save()" class="auction-form">
@@ -25,6 +25,17 @@
                name="addOnLink">
       </mat-form-field>
     </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Image Link (optional)</mat-label>
+      <input matInput type="url" maxlength="1000" placeholder="https://..."
+             [ngModel]="addOnImageUrl()" (ngModelChange)="addOnImageUrl.set($event)"
+             name="addOnImageUrl">
+    </mat-form-field>
+
+    <mat-checkbox [checked]="saveAsPreset()" (change)="saveAsPreset.set($event.checked)">
+      Also save to My Add-Ons for future flips
+    </mat-checkbox>
   </form>
 </div>
 

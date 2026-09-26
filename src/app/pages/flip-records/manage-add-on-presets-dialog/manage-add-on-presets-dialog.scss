@@ -1,0 +1,127 @@
+h2[mat-dialog-title] {
+  padding: 32px 32px 0 32px;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+div[mat-dialog-content] {
+  padding: 16px 32px;
+}
+
+div[mat-dialog-actions] {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.hint,
+.empty {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.preset-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+
+  th,
+  td {
+    text-align: left;
+    padding: 4px 8px 4px 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    font-weight: 600;
+    color: #666;
+  }
+
+  .link-cell {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #666;
+  }
+
+  .actions {
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .inline-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+
+    &.price {
+      max-width: 100px;
+    }
+  }
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 16px 0 8px;
+}
+
+.new-preset {
+  // Row 1: Name | Price    Row 2: Link | Image Link    Row 3: preview + button
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 12px;
+
+  .name,
+  .link {
+    grid-column: 1;
+  }
+
+  .price,
+  .image-link {
+    grid-column: 2;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .new-preset-footer {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+
+    .name, .link, .price, .image-link {
+      grid-column: 1;
+    }
+  }
+}
+
+.thumb-cell {
+  width: 44px;
+}
+
+.thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+
+  &.large {
+    width: 48px;
+    height: 48px;
+  }
+}

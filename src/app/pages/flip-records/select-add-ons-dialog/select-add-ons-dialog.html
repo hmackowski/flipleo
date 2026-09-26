@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>Select Add-Ons</h2>
+
+<div mat-dialog-content>
+  @if (presets().length > 0) {
+    <mat-form-field appearance="outline" class="search">
+      <mat-label>Search your add-ons</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput type="text" [ngModel]="search()" (ngModelChange)="search.set($event)" name="search">
+    </mat-form-field>
+
+    <div class="preset-list">
+      @for (preset of filteredPresets(); track preset.id) {
+        <div class="preset-row" [class.selected]="isSelected(preset)" (click)="toggle(preset)">
+          <mat-checkbox [checked]="isSelected(preset)" (click)="$event.stopPropagation()"
+                        (change)="toggle(preset)"></mat-checkbox>
+          @if (preset.imageUrl) {
+            <img class="thumb" [src]="preset.imageUrl" [alt]="preset.name" loading="lazy">
+          } @else {
+            <div class="thumb placeholder"><mat-icon>build</mat-icon></div>
+          }
+          <span class="name">{{ preset.name }}</span>
+          <span class="price">{{ preset.defaultPrice | currency }}</span>
+        </div>
+      } @empty {
+        <p class="empty">No add-ons match "{{ search() }}".</p>
+      }
+    </div>
+  } @else if (loaded()) {
+    <div class="no-presets">
+      <mat-icon>inventory_2</mat-icon>
+      <p>You don't have any saved add-ons yet.</p>
+      <button mat-raised-button color="primary" type="button" (click)="openManagePresets()">
+        <mat-icon>add</mat-icon> Create Add-Ons
+      </button>
+    </div>
+  }
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button type="button" (click)="openManagePresets()">
+    <mat-icon>tune</mat-icon> Manage Add-Ons
+  </button>
+
+  <span class="spacer"></span>
+
+  @if (selectedPresets().length > 0) {
+    <span class="summary">{{ selectedPresets().length }} selected · {{ selectedTotal() | currency }}</span>
+  }
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" type="button" (click)="add()" [disabled]="selectedPresets().length === 0">
+    <mat-icon>add</mat-icon> Add{{ selectedPresets().length > 0 ? ' (' + selectedPresets().length + ')' : '' }}
+  </button>
+</div>

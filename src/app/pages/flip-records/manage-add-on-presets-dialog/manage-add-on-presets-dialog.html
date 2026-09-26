@@ -1,0 +1,124 @@
+<h2 mat-dialog-title>My Add-Ons</h2>
+
+<div mat-dialog-content>
+  <p class="hint">
+    Save the parts you use often (for example TMR joysticks) so you can pick them from "Add-Ons" when logging a flip.
+    Changing a price here does not change flips you've already logged.
+  </p>
+
+  @if (presets().length > 0) {
+    <table class="preset-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Default Price</th>
+          <th>Link</th>
+          <th>Image Link</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (preset of presets(); track preset.id) {
+          @if (editingId() === preset.id) {
+            <tr>
+              <td class="thumb-cell">
+                @if (editImageUrl().trim()) {
+                  <img class="thumb" [src]="editImageUrl().trim()" alt="">
+                }
+              </td>
+              <td>
+                <input class="inline-input" type="text" maxlength="200"
+                       [ngModel]="editName()" (ngModelChange)="editName.set($event)" name="editName">
+              </td>
+              <td>
+                <input class="inline-input price" type="number" min="0"
+                       [ngModel]="editPrice()" (ngModelChange)="editPrice.set($event)" name="editPrice">
+              </td>
+              <td>
+                <input class="inline-input" type="url" maxlength="1000" placeholder="https://..."
+                       [ngModel]="editLink()" (ngModelChange)="editLink.set($event)" name="editLink">
+              </td>
+              <td>
+                <input class="inline-input" type="url" maxlength="1000" placeholder="https://..."
+                       [ngModel]="editImageUrl()" (ngModelChange)="editImageUrl.set($event)" name="editImageUrl">
+              </td>
+              <td class="actions">
+                <button mat-icon-button type="button" color="primary" (click)="saveEdit()"
+                        [disabled]="!isEditValid()" title="Save">
+                  <mat-icon>check</mat-icon>
+                </button>
+                <button mat-icon-button type="button" (click)="cancelEdit()" title="Cancel">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </td>
+            </tr>
+          } @else {
+            <tr>
+              <td class="thumb-cell">
+                @if (preset.imageUrl) {
+                  <img class="thumb" [src]="preset.imageUrl" [alt]="preset.name" loading="lazy">
+                }
+              </td>
+              <td>{{ preset.name }}</td>
+              <td>{{ preset.defaultPrice | currency }}</td>
+              <td class="link-cell">{{ preset.link }}</td>
+              <td class="link-cell">{{ preset.imageUrl }}</td>
+              <td class="actions">
+                <button mat-icon-button type="button" (click)="startEdit(preset)" title="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button type="button" color="warn" (click)="deletePreset(preset)" title="Delete">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="empty">No saved add-ons yet. Add your first one below.</p>
+  }
+
+  <h3>New add-on</h3>
+  <form class="new-preset" (ngSubmit)="addPreset()">
+    <mat-form-field appearance="outline" class="name">
+      <mat-label>Name</mat-label>
+      <input matInput type="text" maxlength="200" placeholder="e.g. TMR Joysticks"
+             [ngModel]="newName()" (ngModelChange)="newName.set($event)" name="newName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="price">
+      <mat-label>Price</mat-label>
+      <span matTextPrefix>$&nbsp;</span>
+      <input matInput type="number" min="0" step="0.01" placeholder="0.00"
+             [ngModel]="newPrice()" (ngModelChange)="newPrice.set($event)" name="newPrice" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="link">
+      <mat-label>Link (optional)</mat-label>
+      <input matInput type="url" maxlength="1000" placeholder="Where to buy it"
+             [ngModel]="newLink()" (ngModelChange)="newLink.set($event)" name="newLink">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="image-link">
+      <mat-label>Image Link (optional)</mat-label>
+      <input matInput type="url" maxlength="1000" placeholder="https://..."
+             [ngModel]="newImageUrl()" (ngModelChange)="newImageUrl.set($event)" name="newImageUrl">
+    </mat-form-field>
+
+    <div class="new-preset-footer">
+      @if (newImageUrl().trim()) {
+        <img class="thumb large" [src]="newImageUrl().trim()" alt="Preview">
+      }
+      <button mat-raised-button color="primary" type="submit" [disabled]="!isNewValid()">
+        <mat-icon>add</mat-icon> Save Add-On
+      </button>
+    </div>
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Done</button>
+</div>

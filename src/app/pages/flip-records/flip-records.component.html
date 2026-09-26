@@ -2,13 +2,17 @@
   <h1>My Flip Records</h1>
 
   <!-- Add Record Form -->
-  <!-- Add Record Form -->
   <mat-card class="add-record-card">
     <mat-card-header>
       <mat-card-title>Add New Flip</mat-card-title>
-      <button mat-raised-button class="add-addon-button" (click)="openCreateAddOnDialog()">
-        <mat-icon>add</mat-icon> Add-On
-      </button>
+      <div class="header-actions">
+        <button mat-button type="button" (click)="openCreateAddOnDialog()" title="Add a one-off add-on that isn't saved in your list">
+          <mat-icon>edit_note</mat-icon> One-Off Add-On
+        </button>
+        <button mat-raised-button class="add-addon-button" type="button" (click)="openSelectAddOnsForNewFlip()">
+          <mat-icon>playlist_add</mat-icon> Add-Ons
+        </button>
+      </div>
     </mat-card-header>
     <mat-card-content>
       <form (ngSubmit)="addRecord()" class="record-form">
@@ -101,7 +105,19 @@
         </div>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="records()" class="records-table">
+        <!-- multiTemplateDataRows: each flip renders a normal row + a hidden detail row -->
+        <table mat-table [dataSource]="records()" multiTemplateDataRows class="records-table">
+          <!-- Expand Column -->
+          <ng-container matColumnDef="expand">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let record">
+              <button mat-icon-button type="button" [attr.aria-label]="isExpanded(record) ? 'Hide add-ons' : 'Show add-ons'"
+                      (click)="toggleExpanded(record); $event.stopPropagation()">
+                <mat-icon class="expand-icon" [class.expanded]="isExpanded(record)">chevron_right</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
           <!-- Date Column -->
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date</th>
@@ -144,17 +160,86 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let record">
-              <button mat-icon-button (click)="addAddOnToRecord(record)" title="Add add-on">
+              <button mat-icon-button (click)="addAddOnToRecord(record); $event.stopPropagation()" title="Add add-on">
                 <mat-icon>add_circle_outline</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteRecord(record.id)" title="Delete">
+              <button mat-icon-button color="warn" (click)="deleteRecord(record.id); $event.stopPropagation()" title="Delete">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
           </ng-container>
 
+          <!-- Expanded detail: the flip's add-ons -->
+          <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let record" [attr.colspan]="displayedColumns.length">
+              @if (isExpanded(record)) {
+                <div class="add-on-detail">
+                  @if (record.addOns.length > 0) {
+                    <table class="add-on-table">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Add-On</th>
+                          <th>Price</th>
+                          <th>Link</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (addOn of record.addOns; track addOn.id) {
+                          <tr>
+                            <td class="thumb-cell">
+                              @if (addOn.imageUrl) {
+                                <img class="add-on-thumb" [src]="addOn.imageUrl" [alt]="addOn.name" loading="lazy">
+                              }
+                            </td>
+                            <td>{{ addOn.name }}</td>
+                            <td>{{ addOn.price | currency }}</td>
+                            <td>
+                              @if (addOn.link) {
+                                <button mat-icon-button type="button" (click)="openLink(addOn.link)" title="Open link">
+                                  <mat-icon>open_in_new</mat-icon>
+                                </button>
+                              }
+                            </td>
+                            <td class="add-on-actions">
+                              <button mat-icon-button type="button" color="warn" (click)="deleteAddOn(addOn.id)" title="Delete add-on">
+                                <mat-icon>delete_outline</mat-icon>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td></td>
+                          <td>Total parts</td>
+                          <td>{{ record.partsPrice | currency }}</td>
+                          <td colspan="2"></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  } @else {
+                    <p class="no-add-ons">No add-ons for this flip yet.</p>
+                  }
+                  <div class="detail-actions">
+                    <button mat-stroked-button type="button" (click)="openSelectAddOnsForRecord(record)">
+                      <mat-icon>playlist_add</mat-icon> Add-Ons
+                    </button>
+                    <button mat-button type="button" (click)="addAddOnToRecord(record)">
+                      <mat-icon>edit_note</mat-icon> One-Off Add-On
+                    </button>
+                  </div>
+                </div>
+              }
+            </td>
+          </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              class="record-row" [class.expanded-row]="isExpanded(row)" (click)="toggleExpanded(row)"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"
+              class="detail-row" [class.collapsed]="!isExpanded(row)"></tr>
         </table>
       </mat-card-content>
     </mat-card>

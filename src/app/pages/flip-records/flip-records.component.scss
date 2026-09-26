@@ -97,8 +97,71 @@ h1 {
     }
   }
 
-  tr:hover {
-    background-color: #f5f5f5;
+  .record-row {
+    cursor: pointer;
+
+    &:hover,
+    &.expanded-row {
+      background-color: #f5f5f5;
+    }
+
+    // Remove the line between a row and its open detail row
+    &.expanded-row td {
+      border-bottom-color: transparent;
+    }
+  }
+
+  .expand-icon {
+    transition: transform 150ms ease;
+
+    &.expanded {
+      transform: rotate(90deg);
+    }
+  }
+
+  .detail-row {
+    height: 0;
+
+    &.collapsed td {
+      border-bottom-width: 0;
+      padding: 0;
+    }
+
+    td {
+      background-color: #fafafa;
+    }
+  }
+}
+
+.add-on-detail {
+  padding: 8px 0 12px 48px;
+
+  .add-on-table {
+    border-collapse: collapse;
+    min-width: 420px;
+    margin-bottom: 4px;
+
+    th, td {
+      text-align: left;
+      padding: 4px 16px 4px 0;
+      font-size: 0.9rem;
+    }
+
+    th {
+      font-weight: 600;
+      color: #666;
+    }
+
+    tfoot td {
+      border-top: 1px solid #ddd;
+      font-weight: 600;
+    }
+  }
+
+  .no-add-ons {
+    margin: 4px 0;
+    color: #888;
+    font-style: italic;
   }
 }
 
@@ -167,3 +230,27 @@ h1 {
   }
 }
 
+.header-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.add-on-thumb {
+  object-fit: cover;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+
+.add-on-thumb {
+  width: 32px;
+  height: 32px;
+  display: block;
+}

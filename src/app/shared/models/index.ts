@@ -1,3 +1,4 @@
+export * from './add-on-preset.model';
 export * from './auction.model';
 export * from './auction-site.model';
 export * from './auth.model';
