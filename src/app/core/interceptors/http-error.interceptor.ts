@@ -4,6 +4,8 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+import { AuthService } from '@app/core/services/auth.service';
+
 /**
  * Shows a message for any failed API call (like HttpErrorInterceptor at work), so
  * components don't each need their own error handling.
@@ -11,16 +13,27 @@ import { MatSnackBar } from '@angular/material/snack-bar';
  */
 export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
+  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      snackBar.open(getMessage(error), 'Dismiss', { duration: 6000 });
+      const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+
+      if (error.status === 401 && !isAuthRequest) {
+        // Token expired or invalid: end the session and send them to log in again
+        authService.logout(true);
+        snackBar.open('Your session has expired. Please log in again.', 'Dismiss', { duration: 6000 });
+      } else if (!isAuthRequest) {
+        snackBar.open(getErrorMessage(error), 'Dismiss', { duration: 6000 });
+      }
+      // Login/register errors are shown on the login form itself
+
       return throwError(() => error);
     })
   );
 };
 
-function getMessage(error: HttpErrorResponse): string {
+export function getErrorMessage(error: HttpErrorResponse): string {
   if (error.status === 0) {
     return 'Could not reach the FlipLeo API. Is it running?';
   }

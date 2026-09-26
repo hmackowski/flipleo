@@ -5,7 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Auction } from '@app/shared/models';
-import { AuctionDataService } from '@app/core/services/data';
+import {AuctionDataService, LookupDataService} from '@app/core/services/data';
 import { AuctionGrid } from './auction-grid/auction-grid';
 import { AuctionCreateDialog } from './auction-create-dialog/auction-create-dialog';
 
@@ -31,6 +31,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private auctionDataService: AuctionDataService,
+    public lookUpDataService: LookupDataService,
     private dialog: MatDialog
   ) {}
 

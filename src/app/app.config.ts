@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChang
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
+import { authInterceptor } from '@app/core/interceptors/auth.interceptor';
 import { httpErrorInterceptor } from '@app/core/interceptors/http-error.interceptor';
 import { routes } from './app.routes';
 
@@ -10,6 +11,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([httpErrorInterceptor]))
+    // Order matters: the token is added first, then errors are handled on the way back
+    provideHttpClient(withInterceptors([authInterceptor, httpErrorInterceptor]))
   ]
 };

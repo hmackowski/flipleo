@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 
+import { AuthResponse } from '@app/shared/models';
+
 /**
- * Browser storage is only used for the login session now.
- * Auctions and flip records are stored in the database through the API
- * (see core/services/data).
+ * Browser storage is only used to remember the login session (the JWT) between page loads.
+ * Auctions and flip records live in the database and are loaded through the API.
  */
 @Injectable({
   providedIn: 'root'
@@ -11,24 +12,24 @@ import { Injectable } from '@angular/core';
 export class StorageService {
   private readonly AUTH_KEY = 'flipleo_auth';
 
-  saveAuthData(userName: string): void {
-    const authData = {
-      userName,
-      timestamp: new Date().toISOString()
-    };
-    localStorage.setItem(this.AUTH_KEY, JSON.stringify(authData));
+  saveAuthData(auth: AuthResponse): void {
+    localStorage.setItem(this.AUTH_KEY, JSON.stringify(auth));
   }
 
-  getAuthData(): { userName: string; timestamp: string } | null {
+  getAuthData(): AuthResponse | null {
     const data = localStorage.getItem(this.AUTH_KEY);
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+
+    try {
+      const auth = JSON.parse(data) as AuthResponse;
+      // Old format from the fake login, or damaged data: ignore it
+      return auth?.token && auth?.user ? auth : null;
+    } catch {
+      return null;
+    }
   }
 
   clearAuthData(): void {
     localStorage.removeItem(this.AUTH_KEY);
-  }
-
-  isAuthenticated(): boolean {
-    return this.getAuthData() !== null;
   }
 }

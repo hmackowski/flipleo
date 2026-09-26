@@ -3,35 +3,51 @@
     <mat-card-header>
       <div class="login-header">
         <img src="assets/flipleo.png" class="login-logo" alt="Flipleo logo">
-        <mat-card-title>Welcome to Flipleo</mat-card-title>
-        <mat-card-subtitle>Sign in to start flipping</mat-card-subtitle>
+        <mat-card-title>{{ isRegisterMode() ? 'Create your Flipleo account' : 'Welcome to Flipleo' }}</mat-card-title>
+        <mat-card-subtitle>{{ isRegisterMode() ? 'Track your own auctions and flips' : 'Sign in to start flipping' }}</mat-card-subtitle>
       </div>
     </mat-card-header>
 
     <mat-card-content>
-      <form (ngSubmit)="login()" class="login-form">
+      <form (ngSubmit)="submit()" class="login-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
+          <mat-label>Email</mat-label>
           <input
             matInput
-            type="text"
-            [(ngModel)]="username"
-            name="username"
+            type="email"
+            [ngModel]="email()" (ngModelChange)="email.set($event)"
+            name="email"
             required
-            autocomplete="username"
+            autocomplete="email"
           >
-          <mat-icon matPrefix>person</mat-icon>
+          <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
+
+        @if (isRegisterMode()) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Display name</mat-label>
+            <input
+              matInput
+              type="text"
+              [ngModel]="displayName()" (ngModelChange)="displayName.set($event)"
+              name="displayName"
+              required
+              maxlength="100"
+              autocomplete="nickname"
+            >
+            <mat-icon matPrefix>person</mat-icon>
+          </mat-form-field>
+        }
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Password</mat-label>
           <input
             matInput
             [type]="hidePassword() ? 'password' : 'text'"
-            [(ngModel)]="password"
+            [ngModel]="password()" (ngModelChange)="password.set($event)"
             name="password"
             required
-            autocomplete="current-password"
+            [attr.autocomplete]="isRegisterMode() ? 'new-password' : 'current-password'"
           >
           <mat-icon matPrefix>lock</mat-icon>
           <button
@@ -39,11 +55,29 @@
             matSuffix
             type="button"
             (click)="togglePasswordVisibility()"
-            [attr.aria-label]="'Hide password'"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
           >
             <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
+          @if (isRegisterMode()) {
+            <mat-hint>At least 8 characters</mat-hint>
+          }
         </mat-form-field>
+
+        @if (isRegisterMode()) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirm password</mat-label>
+            <input
+              matInput
+              [type]="hidePassword() ? 'password' : 'text'"
+              [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)"
+              name="confirmPassword"
+              required
+              autocomplete="new-password"
+            >
+            <mat-icon matPrefix>lock</mat-icon>
+          </mat-form-field>
+        }
 
         @if (errorMessage()) {
           <div class="error-message">
@@ -52,8 +86,22 @@
           </div>
         }
 
-        <button mat-raised-button color="primary" type="submit" class="login-button">
-          Sign In
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="login-button"
+          [disabled]="!isFormValid() || isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            {{ isRegisterMode() ? 'Create Account' : 'Sign In' }}
+          }
+        </button>
+
+        <button mat-button type="button" class="full-width" (click)="toggleMode()">
+          {{ isRegisterMode() ? 'Already have an account? Sign in' : "Don't have an account? Create one" }}
         </button>
       </form>
     </mat-card-content>
