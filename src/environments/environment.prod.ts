@@ -5,8 +5,8 @@ export const environment: Environment = {
   production: true,
   environmentName: 'production',
   api: {
-    // The API on Azure App Service, via the custom domain (see the go-live guide).
-    // No custom domain yet? Use the App Service URL instead, e.g. 'https://flipleo-api.azurewebsites.net'
-    rootUrl: 'https://api.flipleo.com',
+    // The API on Azure App Service (Free F1 tier: no custom domain, so use the azurewebsites address).
+    // After upgrading to Basic B1 + custom domain, change this to 'https://api.flipleo.com'.
+    rootUrl: 'https://flipleo-api-a7ahcqhwgdbuc9cc.centralus-01.azurewebsites.net',
   },
 };
